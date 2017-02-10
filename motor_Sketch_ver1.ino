@@ -21,27 +21,30 @@ void setup()
   }
 void loop()
   {
-    for (int i = 0; i <= 400; i++)
+    for (int i = 0; i <= 1000; i++)
     {
       md.setM1Speed(i);
+      md.setM2Speed(-i);
       stopIfFault();
-        if (i%200 == 100)
+        if (i%500 == 0)
           {
             Serial.print("M1 current: ");
             Serial.println(md.getM1CurrentMilliamps());
-          }
-    delay(2);
-    }
-    for (int i = 0; i <= 400; i++)
-      {
-        md.setM2Speed(i);
-        stopIfFault();
-          if (i%200 == 100)
-          {
             Serial.print("M2 current: ");
             Serial.println(md.getM2CurrentMilliamps());
           }
-        delay(2);
-      }
+    delay(100);
+    }
+//    for (int i = 400; i <= 400; i--)
+//      {
+//        
+//        stopIfFault();
+//          if (i%200 == 100)
+//          {
+//            Serial.print("M2 current: ");
+//            Serial.println(md.getM2CurrentMilliamps());
+//          }
+//        delay(2);
+//      }
 
   }
