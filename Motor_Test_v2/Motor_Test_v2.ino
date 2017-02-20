@@ -1,5 +1,6 @@
 #include "DualVNH5019MotorShield.h"
 DualVNH5019MotorShield md;
+const float pi = 3.14;
 void stopIfFault()
   {
     if (md.getM1Fault())
@@ -23,19 +24,19 @@ void setup()
   }
 void loop()
   {
-    for (int i = 50; i <= 300; i++)
-    {
-      md.setM1Speed(i);
-      md.setM2Speed(-i);
+    for (int i = 250; i <= 300; i++)
+{
+      md.setM1Speed(i*sin((i-250)*pi/25));
+      md.setM2Speed(-i*sin((i-250)*pi/25));
       stopIfFault();
-        if (i%200 == 0)
-          {
-            Serial.print("M1 current: ");
-            Serial.println(md.getM1CurrentMilliamps());
-            Serial.print("M2 current: ");
-            Serial.println(md.getM2CurrentMilliamps());
-          }
-    delay(100);
+      if (i%200 == 0) {
+        Serial.print("M1 current: ");
+        Serial.println(md.getM1CurrentMilliamps());
+        Serial.print("M2 current: ");
+        Serial.println(md.getM2CurrentMilliamps());
+      }
+      delay(100);
+      Serial.println(analogRead(A0));
     }
 //    for (int i = 400; i <= 400; i--)
 //      {
