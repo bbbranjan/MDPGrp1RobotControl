@@ -41,7 +41,7 @@ void loop() {
   
   myPID.Compute();
   
-  Serial.print("Left:"); 
+  Serial.print("Left:");
   Serial.print(leftEncoderValue);
   Serial.print(", Right:");
   Serial.print(rightEncoderValue);
