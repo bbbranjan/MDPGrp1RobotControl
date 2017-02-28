@@ -15,7 +15,7 @@ double difference;
 double Setpoint, Input, Output;
 //double Kp=1.7, Ki=0, Kd=0;
 //562.25 square wave = one revolution
-PID myPID(&leftEncoderValue, &Output, &rightEncoderValue, 0.5, 0, 0, DIRECT);
+PID myPID(&leftEncoderValue, &Output, &rightEncoderValue, 0.50, 0, 0, DIRECT);
 //PID(&input, &output, &setpoint, Kp, Ki, Kd, Direction)
 //Parameters: Input - the variable we are trying to control
 //          : Output - the variable that willl be adjusted by PID
@@ -32,16 +32,14 @@ void setup() {
   attachPCINT(digitalPinToPCINT(RIGHT_ENCODER), rightEncoderInc, HIGH);
   myPID.SetOutputLimits(-50,50);
   myPID.SetMode(AUTOMATIC);
+
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  md.setSpeeds(300+Output,300-Output);
+  md.setSpeeds(200+Output,-200+Output);
   
   myPID.Compute();
-  
-  //difference = counterA - counterB;
-  //difference = abs(difference);
   
   Serial.print("Left:"); 
   Serial.print(leftEncoderValue);
@@ -50,17 +48,12 @@ void loop() {
   Serial.print(", Diff:");
   Serial.println(Output);
 
-  if((leftEncoderValue > 10050.00) || (rightEncoderValue > 10050.00)) {
+  if((leftEncoderValue > 9600.00) || (rightEncoderValue > 9600.00)) {
     md.setBrakes(400,400);
     shutdown();
   }
-
-  //Serial.println(difference);
-
-//    delay(50);
-    
+  
 }
-
 void leftEncoderInc(void){
   leftEncoderValue++;
   }
@@ -76,4 +69,3 @@ void shutdown()
  // Serial.print("stopped");  // or other warning 
  while(1);
 }
-  
