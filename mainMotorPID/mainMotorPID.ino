@@ -32,6 +32,7 @@ void setup() {
   attachPCINT(digitalPinToPCINT(RIGHT_ENCODER), rightEncoderInc, HIGH);
   myPID.SetOutputLimits(-50,50);
   myPID.SetMode(AUTOMATIC);
+
 }
 
 void loop() {

@@ -1,5 +1,5 @@
-#include <SharpIR.h>
-#include <RunningMedian.h>
+#include "SharpIR.h"
+#include "RunningMedian.h"
 
 #define ir A0
 #define model 1080
@@ -36,7 +36,7 @@ void loop(){
  while (1){  // it only runs the loop once
   
 
-  unsigned long pepe1=millis();  // takes the time before the loop on the library begins
+//  unsigned long pepe1=millis();  // takes the time before the loop on the library begins
   
   
 
@@ -47,9 +47,9 @@ void loop(){
   Serial.print("Mean distance: ");  // returns it to the serial monitor
   Serial.println(dis);
   Serial.println(m);
-  unsigned long pepe2=millis()-pepe1;  // the following gives you the time taken to get the measurement
-  Serial.print("Time taken (ms): ");
-  Serial.println(pepe2);  
+//  unsigned long pepe2=millis()-pepe1;  // the following gives you the time taken to get the measurement
+//  Serial.print("Time taken (ms): ");
+//  Serial.println(pepe2);  
   delay(400);
   
   //done=true;

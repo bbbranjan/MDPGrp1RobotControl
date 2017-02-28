@@ -15,7 +15,7 @@
 // #       Pin 6 COMP/TRIG (URM V3.2) -> Pin 5 (Arduino)
 // #
 int URPWM = 6; // PWM Output 0－25000US，Every 50US represent 1cm
-int URTRIG=9; // PWM trigger pin
+int URTRIG=11; // PWM trigger pin
  
 unsigned int Distance=0;
 uint8_t EnPwmCmd[4]={0x44,0x02,0xbb,0x01};    // distance measure command
@@ -60,7 +60,7 @@ void PWM_Mode()
     {
       Distance=DistanceMeasured/50;           // every 50us low level stands for 1cm
       Serial.print("Distance=");
-      Serial.print(Distance);
+      Serial.print(Distance-2);
       Serial.println("cm");
     }
 
