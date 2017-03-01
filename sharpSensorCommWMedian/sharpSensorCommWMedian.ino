@@ -1,7 +1,7 @@
 #include "SharpIR.h"
 #include "RunningMedian.h"
 
-#define ir A0
+#define ir A5
 #define model 1080
 
 boolean done=false;
