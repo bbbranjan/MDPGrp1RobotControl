@@ -87,7 +87,7 @@ void loop() {
       piCommand_buffer[i] = readChar;
       i++;
       
-      if (readChar == '|'){
+      if (readChar == '\n'){
         i = 1;
         break;
       }
@@ -96,48 +96,54 @@ void loop() {
 
   instruction = piCommand_buffer[0];
 
-  while (piCommand_buffer[i] != '|') {
+  while (piCommand_buffer[i] != '\n') {
     arg *= 10; 
     arg = arg + (piCommand_buffer[i] - 48); 
     i++;
   }
 //  Serial.println(arg);
   switch(instruction){
-     case 'F':
-      moveForward();
-      message1 = "F";
-      message2 = "done";
-      mainMessage = message1 + message2 ;
-      Serial.println(mainMessage);      
+    
+      case 'F':
+        moveForward();
+        message1 = "F";
+        message2 = "done";
+        mainMessage = message1 + message2 ;
+        Serial.println(mainMessage);      
       break;
+      
       case 'B':
-      moveBackward();
-      message1 = "B";
-      message2 = "done";
-      mainMessage = message1 + message2 ;
-      Serial.println(mainMessage);      
+        moveBackward();
+        message1 = "B";
+        message2 = "done";
+        mainMessage = message1 + message2 ;
+        Serial.println(mainMessage);      
       break;
+      
       case 'L':
-      turnLeft();
-      message1 = "L";
-      message2 = "done";
-      mainMessage = message1 + message2 ;
-      Serial.println(mainMessage);      
+        turnLeft();
+        message1 = "L";
+        message2 = "done";
+        mainMessage = message1 + message2 ;
+        Serial.println(mainMessage);      
       break;
+      
       case 'R':
-      turnRight();
-      message1 = "R";
-      message2 = "done";
-      mainMessage = message1 + message2 ;
-      Serial.println(mainMessage);      
+        turnRight();
+        message1 = "R";
+        message2 = "done";
+        mainMessage = message1 + message2 ;
+        Serial.println(mainMessage);      
       break;
+      
       case 'S':
-      sense();
-      message1 = "S";
-      message2 = "done";
-      mainMessage = message1 + message2 ;
-      Serial.println(mainMessage);      
+        sense();
+        message1 = "S";
+        message2 = "done";
+        mainMessage = message1 + message2 ;
+        Serial.println(mainMessage);      
       break;
+      
   }
 }
 
