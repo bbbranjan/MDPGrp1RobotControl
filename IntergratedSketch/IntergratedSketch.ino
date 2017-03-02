@@ -194,14 +194,14 @@ void turnRight(){
 
 void sense(){
   PWM_Mode();
-//  Serial.print("RF_IR: ");
-//  calObsAwayRFIR(ir_sense(sharp_rf));
-//  Serial.print("LF_IR: ");
-//  calObsAwayLFIR(ir_sense(sharp_lf)); 
-//  Serial.print("LS_IR: ");
-//  calObsAwayLSIR(ir_sense(sharp_ls));
-//  Serial.print("RS_IR: ");
-//  calObsAwayRSIR(ir_sense(sharp_rs));
+  Serial.print("RF_IR: ");
+  Serial.print(calObsAwayRFIR(ir_sense(sharp_rf)));
+  Serial.print("LF_IR: ");
+  calObsAwayLFIR(ir_sense(sharp_lf)); 
+  Serial.print("LS_IR: ");
+  calObsAwayLSIR(ir_sense(sharp_ls));
+  Serial.print("RS_IR: ");
+  calObsAwayRSIR(ir_sense(sharp_rs));
   
 }
 
