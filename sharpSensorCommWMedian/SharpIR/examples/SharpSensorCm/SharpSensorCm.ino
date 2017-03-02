@@ -1,7 +1,7 @@
 #include <SharpIR.h>
 
-#define ir A0
-#define model 20150
+#define ir A5
+#define model 1080
 
 boolean done=false;
 
@@ -30,7 +30,7 @@ void setup(){
 
 void loop(){
 
-  delay(2000);    // it gives you time to open the serial monitor after you upload the sketch
+  delay(200);    // it gives you time to open the serial monitor after you upload the sketch
   
  if (done==false){  // it only runs the loop once
   
@@ -49,8 +49,8 @@ void loop(){
   Serial.print("Time taken (ms): ");
   Serial.println(pepe2);  
 
-
-done=true;
+  delay(100);
+//  done=true;
   
 }
 

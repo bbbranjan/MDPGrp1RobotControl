@@ -1,2 +1,20 @@
+#######################################
+# Syntax Coloring Map for SharpIR
+# "traditional" and template variant
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
 SharpIR	KEYWORD1
-distance	KEYWORD2
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+distance KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
