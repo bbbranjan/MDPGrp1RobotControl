@@ -87,7 +87,7 @@ void loop() {
       piCommand_buffer[i] = readChar;
       i++;
       
-      if (readChar == '\n'){
+      if (readChar == '|'){
         i = 1;
         break;
       }
@@ -96,7 +96,7 @@ void loop() {
 
   instruction = piCommand_buffer[0];
 
-  while (piCommand_buffer[i] != '\n') {
+  while (piCommand_buffer[i] != '|') {
     arg *= 10; 
     arg = arg + (piCommand_buffer[i] - 48); 
     i++;
@@ -137,6 +137,7 @@ void loop() {
       break;
       
       case 'S':
+        Serial.print("a");
         sense();
         message1 = "S";
         message2 = "done";
@@ -162,9 +163,9 @@ void moveBackward(){
   leftEncoderValue = 0, rightEncoderValue = 0;
   Output = 0;
 
-  while(leftEncoderValue <= 715.00){
+  while(leftEncoderValue <= (int)(562.25*arg/(3.0*3.14159))){
     myPID.Compute();
-    md.setSpeeds(-(200+Output), -(200-Output));
+    md.setSpeeds(-(250+Output), -(250-Output));
   }
   md.setBrakes(400,400);
 }
@@ -194,14 +195,14 @@ void turnRight(){
 
 void sense(){
   PWM_Mode();
-  Serial.print("RF_IR: ");
-  Serial.print(calObsAwayRFIR(ir_sense(sharp_rf)));
-  Serial.print("LF_IR: ");
-  calObsAwayLFIR(ir_sense(sharp_lf)); 
-  Serial.print("LS_IR: ");
-  calObsAwayLSIR(ir_sense(sharp_ls));
-  Serial.print("RS_IR: ");
-  calObsAwayRSIR(ir_sense(sharp_rs));
+//  Serial.print("RF_IR: ");
+//  Serial.print(calObsAwayRFIR(ir_sense(sharp_rf)));
+//  Serial.print("LF_IR: ");
+//  calObsAwayLFIR(ir_sense(sharp_lf)); 
+//  Serial.print("LS_IR: ");
+//  calObsAwayLSIR(ir_sense(sharp_ls));
+//  Serial.print("RS_IR: ");
+//  calObsAwayRSIR(ir_sense(sharp_rs));
   
 }
 
