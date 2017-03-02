@@ -1,7 +1,7 @@
 #include <DualVNH5019MotorShield.h>
 #include <PinChangeInterrupt.h>
 #include <PID_v1.h>
-#include <SharpIR.h>
+#include <SharpIRNormal.h>
 #include <RunningMedian.h>
 
 #define LEFT_ENCODER 3
@@ -42,6 +42,10 @@ int URTRIG = 11; // //PWM trigger pin
 
 unsigned int Distance = 0;
 uint8_t EnPwmCmd[4] = {0x44, 0x02, 0xbb, 0x01}; // distance measure command
+String mainMessage, message1, message2, message3;
+//loop function
+char piCommand_buffer[10], readChar, instruction;
+int i, arg;
 
 void setup() {
   // put your setup code here, to run once:
@@ -58,7 +62,38 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
+  i = 0, arg = 0;
 
+  while (1){
+    if (Serial.available()){
+      readChar = Serial.read();
+      piCommand_buffer[i] = readChar;
+      i++;
+      
+      if (readChar == '|'){
+        i = 1;
+        break;
+      }
+    }
+  }  
+
+  instruction = piCommand_buffer[0];
+
+  while (piCommand_buffer[i] != '|') {
+    arg *= 10; 
+    arg = arg + (piCommand_buffer[i] - 48); 
+    i++;
+  }
+
+  switch(instruction){
+     case 'W':
+      moveForward();
+      message1 = "W";
+      message2 = "done";
+      mainMessage = message1 + message2 ;
+      Serial.println(mainMessage);      
+      break;
+  }
 }
 
 void moveForward(){
@@ -66,7 +101,7 @@ void moveForward(){
   Output = 0;
 
   while(leftEncoderValue != 4498.00){
-    md.setSpeed(200+Output, 200-Output);
+    md.setSpeeds(200+Output, 200-Output);
   }
   md.setBrakes(400,400);
 }
@@ -84,10 +119,10 @@ void moveBackward(){
 void turnLeft(){
   leftEncoderValue = 0, rightEncoderValue = 0;
   Output = 0;
-
-  while((leftEncoderValue - turnLeftEncoderValue <= 800.00) && 
-        (rightEncoderValue - turnRightEncoderValue <= 800.00)){
-          md.setSpeeds(-(200+Output), 200-Output));
+  
+  while((leftEncoderValue  <= 800.00) && 
+        (rightEncoderValue <= 800.00)){
+          md.setSpeeds(-(200+Output), 200-Output);
         }
         md.setBrakes(400,400);
 }
@@ -96,11 +131,18 @@ void turnRight(){
   leftEncoderValue = 0, rightEncoderValue = 0;
   Output = 0;
 
-  while((leftEncoderValue - turnLeftEncoderValue <= 800.00) && 
-        (rightEncoderValue - turnRightEncoderValue <= 800.00)){
+  while((leftEncoderValue <= 800.00) && 
+        (rightEncoderValue <= 800.00)){
           md.setSpeeds(200+Output, -(200-Output));
         }
         md.setBrakes(400,400);
   
 }
+
+void leftEncoderInc(){
+  leftEncoderValue++;
+}
+ void rightEncoderInc(){
+  rightEncoderValue++;
+ }
 
