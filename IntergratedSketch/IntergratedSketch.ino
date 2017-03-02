@@ -158,7 +158,7 @@ void moveBackward(){
 
   while(leftEncoderValue <= 715.00){
     myPID.Compute();
-    md.setSpeeds(200+Output, 200-Output);
+    md.setSpeeds(-(200+Output), -(200-Output));
   }
   md.setBrakes(400,400);
 }
@@ -189,13 +189,13 @@ void turnRight(){
 void sense(){
   PWM_Mode();
 //  Serial.print("RF_IR: ");
-//  ir_sense(sharp_rf);
+//  calObsAwayRFIR(ir_sense(sharp_rf));
 //  Serial.print("LF_IR: ");
-//  ir_sense(sharp_lf); 
+//  calObsAwayLFIR(ir_sense(sharp_lf)); 
 //  Serial.print("LS_IR: ");
-//  ir_sense(sharp_ls);
+//  calObsAwayLSIR(ir_sense(sharp_ls));
 //  Serial.print("RS_IR: ");
-//  ir_sense(sharp_rs);
+//  calObsAwayRSIR(ir_sense(sharp_rs));
   
 }
 
@@ -210,7 +210,33 @@ int ir_sense(SharpIR sharp) {
 //  Serial.println(m);
   return(dis);
 }
+int calObsAwayRFIR(int dis){
+  if(abs(dis) < 10) return 1;
+  else if(abs(dis) < 23) return 2;
+  else if(abs(dis) < 36) return 3;
+  else return -1;
+}
 
+int calObsAwayLFIR(int dis){
+  if(abs(dis) < 10) return 1;
+  else if(abs(dis) <21) return 2;
+  else if(abs(dis) <35) return 3;
+  else return -1;
+}
+
+int calObsAwayLSIR(int dis){
+  if(abs(dis) < 10) return 1;
+  else if(abs(dis) < 20) return 2;
+  else if(abs(dis) < 30) return 3;
+  else return -1;
+}
+
+int calObsAwayRSIR(int dis){
+  if(abs(dis) < 10) return 1;
+  else if(abs(dis)<20) return 2;
+  else if(abs(dis)<33) return 3;
+  else return -1;
+}
 void PWM_Mode_Setup()
 { 
   pinMode(URTRIG,OUTPUT);                     // A low pull on pin COMP/TRIG
