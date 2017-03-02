@@ -1,7 +1,7 @@
 #include <DualVNH5019MotorShield.h>
 #include <PinChangeInterrupt.h>
 #include <PID_v1.h>
-#include <SharpIRNormal.h>
+#include <SharpIR.h>
 #include <RunningMedian.h>
 
 #define LEFT_ENCODER 3
@@ -9,6 +9,8 @@
 #define RF_IR A2
 #define LF_IR A3
 #define LS_IR A4
+#define RS_IR A5
+#define model 1080
 
 DualVNH5019MotorShield md;
 
@@ -47,6 +49,13 @@ String mainMessage, message1, message2, message3;
 char piCommand_buffer[10], readChar, instruction;
 int i, arg;
 
+SharpIR sharp_rf(RF_IR, 25, 93, model);
+SharpIR sharp_lf(LF_IR, 25, 93, model);
+SharpIR sharp_ls(LS_IR, 25, 93, model);
+SharpIR sharp_rs(RS_IR, 25, 93, model);
+
+RunningMedian samples = RunningMedian(7);
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
@@ -57,11 +66,19 @@ void setup() {
   attachPCINT(digitalPinToPCINT(RIGHT_ENCODER), rightEncoderInc, HIGH);
   myPID.SetOutputLimits(-50, 50);
   myPID.SetMode(AUTOMATIC);
+
+  pinMode(RF_IR, INPUT);
+  pinMode(LF_IR, INPUT);
+  pinMode(LS_IR, INPUT);
+  pinMode(RS_IR, INPUT);
+
+  PWM_Mode_Setup();  
   
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
+  
   i = 0, arg = 0;
 
   while (1){
@@ -84,11 +101,39 @@ void loop() {
     arg = arg + (piCommand_buffer[i] - 48); 
     i++;
   }
-
+//  Serial.println(arg);
   switch(instruction){
-     case 'W':
+     case 'F':
       moveForward();
-      message1 = "W";
+      message1 = "F";
+      message2 = "done";
+      mainMessage = message1 + message2 ;
+      Serial.println(mainMessage);      
+      break;
+      case 'B':
+      moveBackward();
+      message1 = "B";
+      message2 = "done";
+      mainMessage = message1 + message2 ;
+      Serial.println(mainMessage);      
+      break;
+      case 'L':
+      turnLeft();
+      message1 = "L";
+      message2 = "done";
+      mainMessage = message1 + message2 ;
+      Serial.println(mainMessage);      
+      break;
+      case 'R':
+      turnRight();
+      message1 = "R";
+      message2 = "done";
+      mainMessage = message1 + message2 ;
+      Serial.println(mainMessage);      
+      break;
+      case 'S':
+      sense();
+      message1 = "S";
       message2 = "done";
       mainMessage = message1 + message2 ;
       Serial.println(mainMessage);      
@@ -100,8 +145,9 @@ void moveForward(){
   leftEncoderValue = 0, rightEncoderValue = 0;
   Output = 0;
 
-  while(leftEncoderValue != 4498.00){
-    md.setSpeeds(200+Output, 200-Output);
+  while(leftEncoderValue <= (int)(562.25*arg/(3.0*3.14159))) {
+    myPID.Compute();
+    md.setSpeeds(250+Output, 250-Output);
   }
   md.setBrakes(400,400);
 }
@@ -110,7 +156,8 @@ void moveBackward(){
   leftEncoderValue = 0, rightEncoderValue = 0;
   Output = 0;
 
-  while(leftEncoderValue != 4498.00){
+  while(leftEncoderValue <= 715.00){
+    myPID.Compute();
     md.setSpeeds(200+Output, 200-Output);
   }
   md.setBrakes(400,400);
@@ -122,6 +169,7 @@ void turnLeft(){
   
   while((leftEncoderValue  <= 800.00) && 
         (rightEncoderValue <= 800.00)){
+          myPID.Compute();
           md.setSpeeds(-(200+Output), 200-Output);
         }
         md.setBrakes(400,400);
@@ -131,12 +179,69 @@ void turnRight(){
   leftEncoderValue = 0, rightEncoderValue = 0;
   Output = 0;
 
-  while((leftEncoderValue <= 800.00) && 
-        (rightEncoderValue <= 800.00)){
-          md.setSpeeds(200+Output, -(200-Output));
-        }
-        md.setBrakes(400,400);
+  while((leftEncoderValue <= 800.00) && (rightEncoderValue <= 800.00)){
+    myPID.Compute();
+    md.setSpeeds(200+Output, -(200-Output));
+  }
+  md.setBrakes(400,400);
+}
+
+void sense(){
+  PWM_Mode();
+//  Serial.print("RF_IR: ");
+//  ir_sense(sharp_rf);
+//  Serial.print("LF_IR: ");
+//  ir_sense(sharp_lf); 
+//  Serial.print("LS_IR: ");
+//  ir_sense(sharp_ls);
+//  Serial.print("RS_IR: ");
+//  ir_sense(sharp_rs);
   
+}
+
+int ir_sense(SharpIR sharp) {
+  int dis=sharp.distance();  // this returns the distance to the object you're measuring
+//  samples.add(dis);
+//  long m = samples.getMedian();
+  
+  // returns it to the serial monitor
+  Serial.print(dis);
+  Serial.println(" cm");
+//  Serial.println(m);
+  return(dis);
+}
+
+void PWM_Mode_Setup()
+{ 
+  pinMode(URTRIG,OUTPUT);                     // A low pull on pin COMP/TRIG
+  digitalWrite(URTRIG,HIGH);                  // Set to HIGH
+  
+  pinMode(URPWM, INPUT);                      // Sending Enable PWM mode command
+  
+  for(int i=0;i<4;i++)
+  {
+//      Serial.write(EnPwmCmd[i]);
+  } 
+}
+ 
+void PWM_Mode()
+{                              // a low pull on pin COMP/TRIG  triggering a sensor reading
+  digitalWrite(URTRIG, LOW);
+  digitalWrite(URTRIG, HIGH);               // reading Pin PWM will output pulses
+   
+  unsigned long DistanceMeasured=pulseIn(URPWM,LOW);
+   
+  if(DistanceMeasured>=10200)
+  {              // the reading is invalid.
+    Serial.println("Invalid");    
+  }
+  else
+  {
+    Distance=DistanceMeasured/50;           // every 50us low level stands for 1cm
+//    Serial.print("Ultrasonic Distance: ");
+    Serial.print(Distance-2);
+//    Serial.println("cm");
+  }
 }
 
 void leftEncoderInc(){
@@ -144,5 +249,10 @@ void leftEncoderInc(){
 }
  void rightEncoderInc(){
   rightEncoderValue++;
- }
-
+}
+void shutdown()
+{
+  // optionally do stop motors dim the LED's etc.
+  // Serial.print("stopped");  // or other warning
+  while (1);
+}

@@ -47,22 +47,22 @@ void PWM_Mode_Setup()
  
 void PWM_Mode()
 {                              // a low pull on pin COMP/TRIG  triggering a sensor reading
-    digitalWrite(URTRIG, LOW);
-    digitalWrite(URTRIG, HIGH);               // reading Pin PWM will output pulses
-     
-    unsigned long DistanceMeasured=pulseIn(URPWM,LOW);
-     
-    if(DistanceMeasured>=10200)
-    {              // the reading is invalid.
-      Serial.println("Invalid");    
-    }
-    else
-    {
-      Distance=DistanceMeasured/50;           // every 50us low level stands for 1cm
-      Serial.print("Distance=");
-      Serial.print(Distance-2);
-      Serial.println("cm");
-    }
+  digitalWrite(URTRIG, LOW);
+  digitalWrite(URTRIG, HIGH);               // reading Pin PWM will output pulses
+   
+  unsigned long DistanceMeasured=pulseIn(URPWM,LOW);
+   
+  if(DistanceMeasured>=10200)
+  {              // the reading is invalid.
+    Serial.println("Invalid");    
+  }
+  else
+  {
+    Distance=DistanceMeasured/50;           // every 50us low level stands for 1cm
+    Serial.print("Distance=");
+    Serial.print(Distance-2);
+    Serial.println("cm");
+  }
 
 }
 
