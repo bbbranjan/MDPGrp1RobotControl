@@ -126,7 +126,7 @@ void loop() {
       
       case 'L':
         Serial.print("p");
-        turnLeft();
+        rotateLeft(90);
         message1 = "L";
         message2 = "done";
         mainMessage = message1 + message2 ;
@@ -135,7 +135,7 @@ void loop() {
       
       case 'R':
         Serial.print("p");
-        turnRight();
+        rotateRight(90);
         message1 = "R";
         message2 = "done";
         mainMessage = message1 + message2 ;
@@ -207,20 +207,21 @@ void turnRight(){
 }
 
 void sense(){
-  PWM_Mode();
-  Serial.print(":");
+  
 //  Serial.print("RF_IR: ");
-  Serial.print(calObsAwayRFIR(ir_sense(sharp_rf)));
+  Serial.print(ir_sense(sharp_ls));
   Serial.print(":");
 //  Serial.print("LF_IR: ");
-  Serial.print(calObsAwayLFIR(ir_sense(sharp_lf)));
+  Serial.print(ir_sense(sharp_lf));
   Serial.print(":"); 
 //  Serial.print("LS_IR: ");
-  Serial.print(calObsAwayLFIR(ir_sense(sharp_ls)));
+  Serial.print(ir_sense(sharp_rf));
   Serial.print(":"); 
 //  Serial.print("RS_IR: ") 
-  Serial.print(calObsAwayLFIR(ir_sense(sharp_rs)));
-  Serial.print(":"); 
+  Serial.print(ir_sense(sharp_rs));
+  Serial.print(":");
+  PWM_Mode();
+  Serial.print(":");
   
 }
 
