@@ -56,6 +56,8 @@ SharpIR sharp_rs(RS_IR, 25, 93, model);
 
 RunningMedian samples = RunningMedian(7);
 
+double DIST_BETWEEN_SENSOR = 13.7;
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
@@ -105,6 +107,7 @@ void loop() {
   switch(instruction){
     
       case 'F':
+        Serial.print("p");
         moveForward();
         message1 = "F";
         message2 = "done";
@@ -113,6 +116,7 @@ void loop() {
       break;
       
       case 'B':
+        Serial.print("p");
         moveBackward();
         message1 = "B";
         message2 = "done";
@@ -121,6 +125,7 @@ void loop() {
       break;
       
       case 'L':
+        Serial.print("p");
         turnLeft();
         message1 = "L";
         message2 = "done";
@@ -129,6 +134,7 @@ void loop() {
       break;
       
       case 'R':
+        Serial.print("p");
         turnRight();
         message1 = "R";
         message2 = "done";
@@ -137,14 +143,21 @@ void loop() {
       break;
       
       case 'S':
-        Serial.print("a");
+        Serial.print("p");
         sense();
         message1 = "S";
         message2 = "done";
         mainMessage = message1 + message2 ;
         Serial.println(mainMessage);      
       break;
-      
+
+      case 'C':
+        Serial.print("p");
+        alignAngle();
+        message1 = "C";
+        message2 = "done";
+        mainMessage = message1 + message2 ;
+        Serial.println(mainMessage);
   }
 }
 
@@ -195,14 +208,19 @@ void turnRight(){
 
 void sense(){
   PWM_Mode();
+  Serial.print(":");
 //  Serial.print("RF_IR: ");
-//  Serial.print(calObsAwayRFIR(ir_sense(sharp_rf)));
+  Serial.print(calObsAwayRFIR(ir_sense(sharp_rf)));
+  Serial.print(":");
 //  Serial.print("LF_IR: ");
-//  calObsAwayLFIR(ir_sense(sharp_lf)); 
+  Serial.print(calObsAwayLFIR(ir_sense(sharp_lf)));
+  Serial.print(":"); 
 //  Serial.print("LS_IR: ");
-//  calObsAwayLSIR(ir_sense(sharp_ls));
-//  Serial.print("RS_IR: ");
-//  calObsAwayRSIR(ir_sense(sharp_rs));
+  Serial.print(calObsAwayLFIR(ir_sense(sharp_ls)));
+  Serial.print(":"); 
+//  Serial.print("RS_IR: ") 
+  Serial.print(calObsAwayLFIR(ir_sense(sharp_rs)));
+  Serial.print(":"); 
   
 }
 
@@ -212,8 +230,8 @@ int ir_sense(SharpIR sharp) {
 //  long m = samples.getMedian();
   
   // returns it to the serial monitor
-  Serial.print(dis);
-  Serial.println(" cm");
+//  Serial.print(dis);
+//  Serial.println(" cm");
 //  Serial.println(m);
   return(dis);
 }
@@ -238,7 +256,7 @@ int calObsAwayLSIR(int dis){
   else return -1;
 }
 
-int calObsAwayRSIR(int dis){
+int calObsAwayRSIR(int dis) {
   if(abs(dis) < 10) return 1;
   else if(abs(dis)<20) return 2;
   else if(abs(dis)<33) return 3;
@@ -282,6 +300,73 @@ void leftEncoderInc(){
 }
  void rightEncoderInc(){
   rightEncoderValue++;
+}
+
+void alignAngle() {
+
+  double rad2deg = 180/3.14159; 
+  
+  int sensor_R_dis = ir_sense(sharp_rf);
+  int sensor_L_dis = ir_sense(sharp_lf);
+
+  int sensorDiff = abs(sensor_R_dis - sensor_L_dis);
+
+  int sensorMeanDiff = 0;
+
+  while (sensorDiff > 0){
+    
+    double sensorMeanDiff = sensorDiff / 2;
+    double sinTheta = sensorMeanDiff / DIST_BETWEEN_SENSOR;
+
+    double thetaAngle = (asin(sinTheta) * rad2deg);
+    
+    if (sensor_L_dis > sensor_R_dis){
+      rotateRight(thetaAngle);
+    }
+    else if (sensor_R_dis > sensor_L_dis){   
+      rotateLeft(thetaAngle);
+    }
+    
+    sensor_R_dis = ir_sense(sharp_rf);
+    sensor_L_dis = ir_sense(sharp_lf);
+    
+    sensorDiff = abs(sensor_R_dis - sensor_L_dis);
+  }
+}
+
+int rotateRight(double angle) {
+  
+  leftEncoderValue = 0, rightEncoderValue = 0;
+  Output = 0;
+  double target_Tick = 0;
+  if (angle <= 90) target_Tick = angle * 8.65; //8.96
+  else if (angle <=180 ) target_Tick = angle * 9.1;    //tune 180
+  else if (angle <=360 ) target_Tick = angle * 8.95;
+  else target_Tick = angle * 8.9;
+
+  while (leftEncoderValue < target_Tick ) {
+    myPID.Compute();
+    md.setSpeeds((200+Output), -(200-Output));
+  }
+  //md.setBrakes(385, 400);
+  md.setBrakes(400,379);
+}
+int rotateLeft(double angle) {
+  
+  leftEncoderValue = 0, rightEncoderValue = 0;
+  Output = 0;
+  double target_Tick = 0;
+  if (angle <= 90) target_Tick = angle * 8.65; //8.96
+  else if (angle <=180 ) target_Tick = angle * 9.1;    //tune 180
+  else if (angle <=360 ) target_Tick = angle * 8.95;
+  else target_Tick = angle * 8.9;
+
+  while (leftEncoderValue < target_Tick ) {
+    myPID.Compute();
+    md.setSpeeds(-(200+Output), (200-Output));
+  }
+  //md.setBrakes(385, 400);
+  md.setBrakes(400,379);
 }
 void shutdown()
 {
