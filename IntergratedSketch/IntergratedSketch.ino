@@ -208,13 +208,13 @@ void turnRight(){
 
 void sense(){
   
-//  Serial.print("RF_IR: ");
+//  Serial.print("LS_IR: ");
   Serial.print(ir_sense(sharp_ls));
   Serial.print(":");
 //  Serial.print("LF_IR: ");
   Serial.print(ir_sense(sharp_lf));
   Serial.print(":"); 
-//  Serial.print("LS_IR: ");
+//  Serial.print("RF_IR: ");
   Serial.print(ir_sense(sharp_rf));
   Serial.print(":"); 
 //  Serial.print("RS_IR: ") 
