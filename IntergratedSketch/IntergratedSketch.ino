@@ -10,6 +10,7 @@
 #define LF_IR A3
 #define LS_IR A4
 #define RS_IR A5
+#define FC_IR A1
 #define model 1080
 
 DualVNH5019MotorShield md;
@@ -39,11 +40,12 @@ Parameters: input - the variable we are trying to control
   Pin 6 COMP/TRIG (URM V3.2) -> Pin 11 (Arduino)
   
 */
-int URPWM = 6; // PWM Output 0-25000US, Eevry 50US represent 1cm
-int URTRIG = 11; // //PWM trigger pin
+//int URPWM = 6; // PWM Output 0-25000US, Eevry 50US represent 1cm
+//int URTRIG = 11; // //PWM trigger pin
+//
+//unsigned int Distance = 0;
+//uint8_t EnPwmCmd[4] = {0x44, 0x02, 0xbb, 0x01}; // distance measure command
 
-unsigned int Distance = 0;
-uint8_t EnPwmCmd[4] = {0x44, 0x02, 0xbb, 0x01}; // distance measure command
 String mainMessage, message1, message2, message3;
 //loop function
 char piCommand_buffer[10], readChar, instruction;
@@ -53,6 +55,7 @@ SharpIR sharp_rf(RF_IR, 25, 93, model);
 SharpIR sharp_lf(LF_IR, 25, 93, model);
 SharpIR sharp_ls(LS_IR, 25, 93, model);
 SharpIR sharp_rs(RS_IR, 25, 93, model);
+SharpIR sharp_fc(FC_IR, 25, 93, model);
 
 RunningMedian samples = RunningMedian(7);
 
@@ -73,16 +76,18 @@ void setup() {
   pinMode(LF_IR, INPUT);
   pinMode(LS_IR, INPUT);
   pinMode(RS_IR, INPUT);
+  pinMode(FC_IR, INPUT);
 
-  PWM_Mode_Setup();  
+//  PWM_Mode_Setup();  
   
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
+
+  int buffer_size = sizeof(piCommand_buffer) / sizeof(*piCommand_buffer);
   
   i = 0, arg = 0;
-  int buffer_size = sizeof(piCommand_buffer) / sizeof(*piCommand_buffer);
 
   while (1){
     if (Serial.available()){
@@ -225,7 +230,8 @@ void sense(){
 //  Serial.print("RS_IR: ") 
   Serial.print(ir_sense(sharp_rs));
   Serial.print(":");
-  PWM_Mode();
+//  PWM_Mode();
+  Serial.print(ir_sense(sharp_fc));
   Serial.print(":");
   
 }
@@ -268,38 +274,46 @@ int calObsAwayRSIR(int dis) {
   else if(abs(dis)<33) return 3;
   else return -1;
 }
-void PWM_Mode_Setup()
-{ 
-  pinMode(URTRIG,OUTPUT);                     // A low pull on pin COMP/TRIG
-  digitalWrite(URTRIG,HIGH);                  // Set to HIGH
-  
-  pinMode(URPWM, INPUT);                      // Sending Enable PWM mode command
-  
-  for(int i=0;i<4;i++)
-  {
-//      Serial.write(EnPwmCmd[i]);
-  } 
+
+int calObsAwayFCIR(int dis) {
+  if(abs(dis) < 10) return 1;
+  else if(abs(dis)<20) return 2;
+  else if(abs(dis)<33) return 3;
+  else return -1;
 }
- 
-void PWM_Mode()
-{                              // a low pull on pin COMP/TRIG  triggering a sensor reading
-  digitalWrite(URTRIG, LOW);
-  digitalWrite(URTRIG, HIGH);               // reading Pin PWM will output pulses
-   
-  unsigned long DistanceMeasured=pulseIn(URPWM,LOW);
-   
-  if(DistanceMeasured>=10200)
-  {              // the reading is invalid.
-    Serial.println("Invalid");    
-  }
-  else
-  {
-    Distance=DistanceMeasured/50;           // every 50us low level stands for 1cm
-//    Serial.print("Ultrasonic Distance: ");
-    Serial.print(Distance-2);
-//    Serial.println("cm");
-  }
-}
+
+//void PWM_Mode_Setup()
+//{ 
+//  pinMode(URTRIG,OUTPUT);                     // A low pull on pin COMP/TRIG
+//  digitalWrite(URTRIG,HIGH);                  // Set to HIGH
+//  
+//  pinMode(URPWM, INPUT);                      // Sending Enable PWM mode command
+//  
+//  for(int i=0;i<4;i++)
+//  {
+////      Serial.write(EnPwmCmd[i]);
+//  } 
+//}
+// 
+//void PWM_Mode()
+//{                              // a low pull on pin COMP/TRIG  triggering a sensor reading
+//  digitalWrite(URTRIG, LOW);
+//  digitalWrite(URTRIG, HIGH);               // reading Pin PWM will output pulses
+//   
+//  unsigned long DistanceMeasured=pulseIn(URPWM,LOW);
+//   
+//  if(DistanceMeasured>=10200)
+//  {              // the reading is invalid.
+//    Serial.println("Invalid");    
+//  }
+//  else
+//  {
+//    Distance=DistanceMeasured/50;           // every 50us low level stands for 1cm
+////    Serial.print("Ultrasonic Distance: ");
+//    Serial.print(Distance-2);
+////    Serial.println("cm");
+//  }
+//}
 
 void leftEncoderInc(){
   leftEncoderValue++;
@@ -380,4 +394,3 @@ void shutdown()
   // Serial.print("stopped");  // or other warning
   while (1);
 }
-
