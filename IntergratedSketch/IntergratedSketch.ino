@@ -175,8 +175,8 @@ void moveForward(){
   leftEncoderValue = 0, rightEncoderValue = 0;
   Output = 0;
 
-  while(leftEncoderValue <= (int)(562.25*arg/(3.0*3.14159))) {
-    md.setSpeeds(250+Output, 265-Output);
+  while(leftEncoderValue <= (int)(562.25*arg/(3.05*3.1416))) {
+    md.setSpeeds(250+Output, 270-Output);
     myPID.Compute();
   }
   md.setBrakes(400,400);
@@ -186,8 +186,8 @@ void moveBackward(){
   leftEncoderValue = 0, rightEncoderValue = 0;
   Output = 0;
 
-  while(leftEncoderValue <= (int)(562.25*arg/(3.0*3.14159))){
-    md.setSpeeds(-(250+Output), -(265-Output));
+  while(leftEncoderValue <= (int)(562.25*arg/(3.05*3.1416))){
+    md.setSpeeds(-(250+Output), -(270-Output));
     myPID.Compute();
   }
   md.setBrakes(400,400);
