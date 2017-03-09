@@ -176,8 +176,8 @@ void moveForward(){
   Output = 0;
 
   while(leftEncoderValue <= (int)(562.25*arg/(3.0*3.14159))) {
+    md.setSpeeds(250+Output, 265-Output);
     myPID.Compute();
-    md.setSpeeds(250+Output, 250-Output);
   }
   md.setBrakes(400,400);
 }
@@ -187,8 +187,8 @@ void moveBackward(){
   Output = 0;
 
   while(leftEncoderValue <= (int)(562.25*arg/(3.0*3.14159))){
+    md.setSpeeds(-(250+Output), -(265-Output));
     myPID.Compute();
-    md.setSpeeds(-(250+Output), -(250-Output));
   }
   md.setBrakes(400,400);
 }
@@ -199,8 +199,8 @@ void turnLeft(){
   
   while((leftEncoderValue  <= 800.00) && 
         (rightEncoderValue <= 800.00)){
+          md.setSpeeds(-(200+Output), 212-Output);
           myPID.Compute();
-          md.setSpeeds(-(200+Output), 200-Output);
         }
         md.setBrakes(400,400);
 }
@@ -210,8 +210,8 @@ void turnRight(){
   Output = 0;
 
   while((leftEncoderValue <= 800.00) && (rightEncoderValue <= 800.00)){
+    md.setSpeeds(200+Output, -(212-Output));
     myPID.Compute();
-    md.setSpeeds(200+Output, -(200-Output));
   }
   md.setBrakes(400,400);
 }
@@ -366,7 +366,7 @@ int rotateRight(double angle) {
 
   while (leftEncoderValue < target_Tick ) {
     myPID.Compute();
-    md.setSpeeds((200+Output), -(200-Output));
+    md.setSpeeds((200+Output), -(210-Output));
   }
   //md.setBrakes(385, 400);
   md.setBrakes(400,379);
@@ -383,7 +383,7 @@ int rotateLeft(double angle) {
 
   while (leftEncoderValue < target_Tick ) {
     myPID.Compute();
-    md.setSpeeds(-(200+Output), (200-Output));
+    md.setSpeeds(-(200+Output), (210-Output));
   }
   //md.setBrakes(385, 400);
   md.setBrakes(400,379);

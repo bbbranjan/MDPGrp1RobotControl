@@ -37,22 +37,23 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  md.setSpeeds(-(200+Output),215-Output);
-  
-  myPID.Compute();
-  
-  Serial.print("Left:");
-  Serial.print(leftEncoderValue);
-  Serial.print(", Right:");
-  Serial.print(rightEncoderValue);
-  Serial.print(", Diff:");
-  Serial.println(Output);
+//  md.setSpeeds(-(210+Output),200-Output);
+//  
+//  myPID.Compute();
+//  
+//  Serial.print("Left:");
+//  Serial.print(leftEncoderValue);
+//  Serial.print(", Right:");
+//  Serial.print(rightEncoderValue);
+//  Serial.print(", Diff:");
+//  Serial.println(Output);
+//
+//  if((leftEncoderValue >= 785.00) || (rightEncoderValue >= 785.00)) {
+//    md.setBrakes(400,400);
+//    shutdown();
+//  }
 
-  if((leftEncoderValue > 790.00) || (rightEncoderValue > 790.00)) {
-    md.setBrakes(400,400);
-    shutdown();
-  }
-  
+  rotateLeft(90);
 }
 void leftEncoderInc(void){
   leftEncoderValue++;
@@ -61,7 +62,26 @@ void leftEncoderInc(void){
 
 void rightEncoderInc(void){
   rightEncoderValue++;
+}
+
+int rotateLeft(double angle) {
+  
+  leftEncoderValue = 0, rightEncoderValue = 0;
+  Output = 0;
+  double target_Tick = 0;
+  if (angle <= 90) target_Tick = angle * 8.65; //8.96
+  else if (angle <=180 ) target_Tick = angle * 9.1;    //tune 180
+  else if (angle <=360 ) target_Tick = angle * 8.95;
+  else target_Tick = angle * 8.9;
+
+  while (leftEncoderValue < target_Tick ) {
+    myPID.Compute();
+    md.setSpeeds(-(200+Output), (210-Output));
   }
+  //md.setBrakes(385, 400);
+  md.setBrakes(400,379);
+  shutdown();
+}
 
 void shutdown()
 {
