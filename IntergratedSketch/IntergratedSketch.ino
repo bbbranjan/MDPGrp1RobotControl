@@ -82,6 +82,7 @@ void loop() {
   // put your main code here, to run repeatedly:
   
   i = 0, arg = 0;
+  int buffer_size = sizeof(piCommand_buffer) / sizeof(*piCommand_buffer);
 
   while (1){
     if (Serial.available()){
@@ -89,7 +90,11 @@ void loop() {
       piCommand_buffer[i] = readChar;
       i++;
       
-      if (readChar == '|'){
+      if (readChar == '#') {
+        return;
+      }
+      
+      if (readChar == '|' || i >= buffer_size) {
         i = 1;
         break;
       }
@@ -98,7 +103,7 @@ void loop() {
 
   instruction = piCommand_buffer[0];
 
-  while (piCommand_buffer[i] != '|') {
+  while (piCommand_buffer[i] != '|' && i < buffer_size) {
     arg *= 10; 
     arg = arg + (piCommand_buffer[i] - 48); 
     i++;
@@ -375,3 +380,4 @@ void shutdown()
   // Serial.print("stopped");  // or other warning
   while (1);
 }
+
