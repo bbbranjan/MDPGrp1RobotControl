@@ -37,7 +37,7 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  md.setSpeeds(250+Output,265-Output);
+  md.setSpeeds(250+Output,270-Output);
   
   myPID.Compute();
   

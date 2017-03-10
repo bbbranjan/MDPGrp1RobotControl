@@ -174,10 +174,16 @@ void loop() {
 void moveForward(){
   leftEncoderValue = 0, rightEncoderValue = 0;
   Output = 0;
-
-  while(leftEncoderValue <= (int)(562.25*arg/(3.05*3.1416))) {
+  //3.5 for lounge
+  while(leftEncoderValue <= (int)(562.25*arg/(3.1*3.1416))|| rightEncoderValue <= (int)(562.25*arg/(3.15*3.1416))) {
     md.setSpeeds(250+Output, 270-Output);
     myPID.Compute();
+//    Serial.print("Left:");
+//    Serial.print(leftEncoderValue);
+//    Serial.print(", Right:");
+//    Serial.print(rightEncoderValue);
+//    Serial.print(", Diff:");
+//    Serial.println(Output);
   }
   md.setBrakes(400,400);
 }
@@ -186,9 +192,15 @@ void moveBackward(){
   leftEncoderValue = 0, rightEncoderValue = 0;
   Output = 0;
 
-  while(leftEncoderValue <= (int)(562.25*arg/(3.05*3.1416))){
+  while(leftEncoderValue <= (int)(562.25*arg/(3.1*3.1416)) || rightEncoderValue <= (int)(562.25*arg/(3.15*3.1416))){
     md.setSpeeds(-(250+Output), -(270-Output));
     myPID.Compute();
+//    Serial.print("Left:"); 
+//    Serial.print(leftEncoderValue);
+//    Serial.print(", Right:");
+//    Serial.print(rightEncoderValue);
+//    Serial.print(", Diff:");
+//    Serial.println(Output);
   }
   md.setBrakes(400,400);
 }
@@ -202,7 +214,7 @@ void turnLeft(){
           md.setSpeeds(-(200+Output), 212-Output);
           myPID.Compute();
         }
-        md.setBrakes(400,400);
+    md.setBrakes(300,300);
 }
 
 void turnRight(){
@@ -369,7 +381,7 @@ int rotateRight(double angle) {
     md.setSpeeds((200+Output), -(210-Output));
   }
   //md.setBrakes(385, 400);
-  md.setBrakes(400,379);
+  md.setBrakes(400,400);
 }
 int rotateLeft(double angle) {
   
@@ -386,7 +398,7 @@ int rotateLeft(double angle) {
     md.setSpeeds(-(200+Output), (210-Output));
   }
   //md.setBrakes(385, 400);
-  md.setBrakes(400,379);
+  md.setBrakes(400,400);
 }
 void shutdown()
 {
