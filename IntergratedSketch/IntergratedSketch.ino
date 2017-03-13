@@ -175,7 +175,7 @@ void moveForward(){
   leftEncoderValue = 0, rightEncoderValue = 0;
   Output = 0;
   //3.5 for lounge
-  while(leftEncoderValue <= (int)(562.25*arg/(3.1*3.1416))|| rightEncoderValue <= (int)(562.25*arg/(3.15*3.1416))) {
+  while(leftEncoderValue <= (int)(562.25*arg/(3.1*3.1416))|| rightEncoderValue <= (int)(562.25*arg/(3.1*3.1416))) {
     md.setSpeeds(250+Output, 270-Output);
     myPID.Compute();
 //    Serial.print("Left:");
@@ -192,7 +192,7 @@ void moveBackward(){
   leftEncoderValue = 0, rightEncoderValue = 0;
   Output = 0;
 
-  while(leftEncoderValue <= (int)(562.25*arg/(3.1*3.1416)) || rightEncoderValue <= (int)(562.25*arg/(3.15*3.1416))){
+  while(leftEncoderValue <= (int)(562.25*arg/(3.1*3.1416)) || rightEncoderValue <= (int)(562.25*arg/(3.1*3.1416))){
     md.setSpeeds(-(250+Output), -(270-Output));
     myPID.Compute();
 //    Serial.print("Left:"); 
@@ -371,7 +371,7 @@ int rotateRight(double angle) {
   leftEncoderValue = 0, rightEncoderValue = 0;
   Output = 0;
   double target_Tick = 0;
-  if (angle <= 90) target_Tick = angle * 8.65; //8.96
+  if (angle <= 90) target_Tick = angle * 8.84; //8.96
   else if (angle <=180 ) target_Tick = angle * 9.1;    //tune 180
   else if (angle <=360 ) target_Tick = angle * 8.95;
   else target_Tick = angle * 8.9;
@@ -388,7 +388,7 @@ int rotateLeft(double angle) {
   leftEncoderValue = 0, rightEncoderValue = 0;
   Output = 0;
   double target_Tick = 0;
-  if (angle <= 90) target_Tick = angle * 8.65; //8.96
+  if (angle <= 90) target_Tick = angle * 8.9; //8.96
   else if (angle <=180 ) target_Tick = angle * 9.1;    //tune 180
   else if (angle <=360 ) target_Tick = angle * 8.95;
   else target_Tick = angle * 8.9;
