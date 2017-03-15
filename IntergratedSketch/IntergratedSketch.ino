@@ -57,7 +57,11 @@ SharpIR sharp_ls(LS_IR, 25, 93, model);
 SharpIR sharp_rs(RS_IR, 25, 93, model);
 SharpIR sharp_fc(FC_IR, 25, 93, model);
 
-RunningMedian samples = RunningMedian(7);
+RunningMedian samples_ls = RunningMedian(7);
+RunningMedian samples_lf = RunningMedian(7);
+RunningMedian samples_rf = RunningMedian(7);
+RunningMedian samples_rs = RunningMedian(7);
+RunningMedian samples_fc = RunningMedian(7);
 
 double DIST_BETWEEN_SENSOR = 14.0;
 
@@ -248,18 +252,28 @@ void moveBackward(){
 void sense(){
   
 //  Serial.print("LS_IR: ");
+//  samples_ls.add(ir_sense(sharp_ls));
+//  long m_ls = samples_ls.getMedian();
   Serial.print(ir_sense(sharp_ls));
   Serial.print(":");
 //  Serial.print("LF_IR: ");
+//  samples_lf.add(ir_sense(sharp_lf));
+//  long m_lf= samples_lf.getMedian();
   Serial.print(ir_sense(sharp_lf));
   Serial.print(":"); 
 //  Serial.print("RF_IR: ");
+//  samples_rf.add(ir_sense(sharp_rf));
+//  long m_rf = samples_rf.getMedian();
   Serial.print(ir_sense(sharp_rf));
   Serial.print(":"); 
 //  Serial.print("RS_IR: ") 
+//  samples_rs.add(ir_sense(sharp_rs));
+//  long m_rs = samples_rs.getMedian();
   Serial.print(ir_sense(sharp_rs));
   Serial.print(":");
-//  PWM_Mode();
+//  Serial.print("FC_IR: ")
+//  samples_fc.add(ir_sense(sharp_fc));
+//  long m_fc = samples_fc.getMedian();
   Serial.print(ir_sense(sharp_fc));
   Serial.print(":");
   
@@ -267,8 +281,7 @@ void sense(){
 
 int ir_sense(SharpIR sharp) {
   int dis=sharp.distance();  // this returns the distance to the object you're measuring
-//  samples.add(dis);
-//  long m = samples.getMedian();
+  
   
   // returns it to the serial monitor
 //  Serial.print(dis);
@@ -378,7 +391,7 @@ void alignAngle() {
 
   if(sensor_R_dis < 10 || sensor_L_dis < 10) {
     isTooClose = true;
-    arg = 4;
+    arg = 3;
     moveBackward();
     delay(500);
   }
@@ -388,8 +401,8 @@ void alignAngle() {
   
   sensorDiff = abs(sensor_R_dis - sensor_L_dis);
 
-  while (sensorDiff > 0){
-    
+  while (sensorDiff > 0) {
+
     double sensorMeanDiff = ((double)sensorDiff) / 2;
     double sinTheta = sensorMeanDiff / DIST_BETWEEN_SENSOR;
 
@@ -410,7 +423,7 @@ void alignAngle() {
   }
 
   if(isTooClose) {
-    arg=4;
+    arg=5;
     moveForward();
     delay(100);
   }
