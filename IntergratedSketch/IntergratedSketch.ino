@@ -6,9 +6,9 @@
 
 #define LEFT_ENCODER 3
 #define RIGHT_ENCODER 5
-#define RF_IR A2
-#define LF_IR A3
 #define LS_IR A4
+#define LF_IR A3
+#define RF_IR A2
 #define RS_IR A5
 #define FC_IR A1
 #define model 1080
@@ -163,11 +163,23 @@ void loop() {
 
       case 'C':
         Serial.print("p");
-        alignAngle();
+        for(int jk=0;jk<2;jk++) {
+          alignAngle();
+        }
         message1 = "C";
         message2 = "done";
         mainMessage = message1 + message2 ;
         Serial.println(mainMessage);
+      break;
+
+      case 'D':
+        Serial.print("p");
+        adjustDistance();
+        message1 = "D";
+        message2 = "done";
+        mainMessage = message1 + message2 ;
+        Serial.println(mainMessage);
+      break;
   }
 }
 
@@ -175,8 +187,8 @@ void moveForward(){
   leftEncoderValue = 0, rightEncoderValue = 0;
   Output = 0;
   //3.5 for lounge
-  while(leftEncoderValue <= (int)(562.25*arg/(3.1*3.1416))|| rightEncoderValue <= (int)(562.25*arg/(3.1*3.1416))) {
-    md.setSpeeds(250+Output, 270-Output);
+  while(leftEncoderValue <= (int)(562.25*arg/(3.18*3.1416))|| rightEncoderValue <= (int)(562.25*arg/(3.18*3.1416))) {
+    md.setSpeeds(201+Output, 261-Output);
     myPID.Compute();
 //    Serial.print("Left:");
 //    Serial.print(leftEncoderValue);
@@ -192,8 +204,8 @@ void moveBackward(){
   leftEncoderValue = 0, rightEncoderValue = 0;
   Output = 0;
 
-  while(leftEncoderValue <= (int)(562.25*arg/(3.1*3.1416)) || rightEncoderValue <= (int)(562.25*arg/(3.1*3.1416))){
-    md.setSpeeds(-(250+Output), -(270-Output));
+  while(leftEncoderValue <= (int)(562.25*arg/(3.18*3.1416)) || rightEncoderValue <= (int)(562.25*arg/(3.18*3.1416))){
+    md.setSpeeds(-(201+Output), -(261-Output));
     myPID.Compute();
 //    Serial.print("Left:"); 
 //    Serial.print(leftEncoderValue);
@@ -214,7 +226,7 @@ void turnLeft(){
           md.setSpeeds(-(200+Output), 212-Output);
           myPID.Compute();
         }
-    md.setBrakes(300,300);
+    md.setBrakes(400,400);
 }
 
 void turnRight(){
@@ -340,14 +352,28 @@ void alignAngle() {
   
   int sensor_R_dis = ir_sense(sharp_rf);
   int sensor_L_dis = ir_sense(sharp_lf);
-
+  
   int sensorDiff = abs(sensor_R_dis - sensor_L_dis);
 
   int sensorMeanDiff = 0;
 
+  sensor_R_dis = ir_sense(sharp_rf);
+  sensor_L_dis = ir_sense(sharp_lf);
+  while((sensor_R_dis < 7 || sensor_L_dis < 7) && (sensor_R_dis + sensor_L_dis < 14)) {
+    arg = 1;
+    moveBackward();
+    sensor_R_dis = ir_sense(sharp_rf);
+    sensor_L_dis = ir_sense(sharp_lf);
+  }
+
+  sensor_R_dis = ir_sense(sharp_rf);
+  sensor_L_dis = ir_sense(sharp_lf);
+  
+  sensorDiff = abs(sensor_R_dis - sensor_L_dis);
+
   while (sensorDiff > 0){
     
-    double sensorMeanDiff = sensorDiff / 2;
+    double sensorMeanDiff = (double)sensorDiff / 2;
     double sinTheta = sensorMeanDiff / DIST_BETWEEN_SENSOR;
 
     double thetaAngle = (asin(sinTheta) * rad2deg);
@@ -364,6 +390,7 @@ void alignAngle() {
     
     sensorDiff = abs(sensor_R_dis - sensor_L_dis);
   }
+  
 }
 
 int rotateRight(double angle) {
@@ -371,10 +398,10 @@ int rotateRight(double angle) {
   leftEncoderValue = 0, rightEncoderValue = 0;
   Output = 0;
   double target_Tick = 0;
-  if (angle <= 90) target_Tick = angle * 8.84; //8.96
+  if (angle <= 90) target_Tick = angle * 9.13; //8.96
   else if (angle <=180 ) target_Tick = angle * 9.1;    //tune 180
   else if (angle <=360 ) target_Tick = angle * 8.95;
-  else target_Tick = angle * 8.9;
+  else target_Tick = angle * 8.96;
 
   while (leftEncoderValue < target_Tick ) {
     myPID.Compute();
@@ -388,7 +415,7 @@ int rotateLeft(double angle) {
   leftEncoderValue = 0, rightEncoderValue = 0;
   Output = 0;
   double target_Tick = 0;
-  if (angle <= 90) target_Tick = angle * 8.9; //8.96
+  if (angle <= 90) target_Tick = angle * 9.17; //8.96
   else if (angle <=180 ) target_Tick = angle * 9.1;    //tune 180
   else if (angle <=360 ) target_Tick = angle * 8.95;
   else target_Tick = angle * 8.9;
@@ -399,6 +426,18 @@ int rotateLeft(double angle) {
   }
   //md.setBrakes(385, 400);
   md.setBrakes(400,400);
+}
+void adjustDistance() {
+  int sensor_R_dis = ir_sense(sharp_rf);
+  int sensor_L_dis = ir_sense(sharp_lf);
+  int sensor_C_dis = ir_sense(sharp_fc);
+  while((sensor_R_dis < 7 || sensor_L_dis < 7 || sensor_C_dis < 7) ) {
+    arg = 1;
+    moveBackward();
+    sensor_R_dis = ir_sense(sharp_rf);
+    sensor_L_dis = ir_sense(sharp_lf);
+    sensor_C_dis = ir_sense(sharp_fc);
+  }
 }
 void shutdown()
 {
