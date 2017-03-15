@@ -22,7 +22,7 @@ double Output = 0;
 double turnLeftEncoderTarget, turnRightEncoderTarget,
        startLeftEncoderValue, startRightEncoderValue;
 
-double Kp=0.5, Ki=0.0, Kd=0.0; 
+double Kp=0.45, Ki=0.0, Kd=0.0; 
 // 562.25 squave wave = one revolution
 PID myPID(&leftEncoderValue, &Output, &rightEncoderValue, Kp, Ki, Kd, DIRECT);
 /*PID(&input, &output, &setpoint, Kp, Ki, Kd, Direction
@@ -59,7 +59,7 @@ SharpIR sharp_fc(FC_IR, 25, 93, model);
 
 RunningMedian samples = RunningMedian(7);
 
-double DIST_BETWEEN_SENSOR = 13.7;
+double DIST_BETWEEN_SENSOR = 14.0;
 
 void setup() {
   // put your setup code here, to run once:
@@ -163,9 +163,7 @@ void loop() {
 
       case 'C':
         Serial.print("p");
-        for(int jk=0;jk<2;jk++) {
-          alignAngle();
-        }
+        alignAngle();
         message1 = "C";
         message2 = "done";
         mainMessage = message1 + message2 ;
@@ -183,12 +181,16 @@ void loop() {
   }
 }
 
-void moveForward(){
-  leftEncoderValue = 0, rightEncoderValue = 0;
-  Output = 0;
-  //3.5 for lounge
-  while(leftEncoderValue <= (int)(562.25*arg/(3.18*3.1416))|| rightEncoderValue <= (int)(562.25*arg/(3.18*3.1416))) {
-    md.setSpeeds(201+Output, 261-Output);
+void moveForward() {
+
+  int fwd_L_encoder = leftEncoderValue;
+  int fwd_R_encoder = rightEncoderValue;
+//  leftEncoderValue = 0, rightEncoderValue = 0;
+//  Output = 0;
+  //3.3 for lounge
+  //3.18 for HWLab 3
+  while(leftEncoderValue <= fwd_L_encoder + (int)(562.25*arg/(3.3*3.1416))|| rightEncoderValue <= fwd_R_encoder + (int)(562.25*arg/(3.3*3.1416))) {
+    md.setSpeeds(201+Output, 258-Output);
     myPID.Compute();
 //    Serial.print("Left:");
 //    Serial.print(leftEncoderValue);
@@ -201,11 +203,14 @@ void moveForward(){
 }
 
 void moveBackward(){
-  leftEncoderValue = 0, rightEncoderValue = 0;
-  Output = 0;
 
-  while(leftEncoderValue <= (int)(562.25*arg/(3.18*3.1416)) || rightEncoderValue <= (int)(562.25*arg/(3.18*3.1416))){
-    md.setSpeeds(-(201+Output), -(261-Output));
+  int bwd_L_encoder = leftEncoderValue;
+  int bwd_R_encoder = rightEncoderValue;
+//  leftEncoderValue = 0, rightEncoderValue = 0;
+//  Output = 0;
+
+  while(leftEncoderValue <= bwd_L_encoder + (int)(562.25*arg/(3.3*3.1416)) || rightEncoderValue <= bwd_R_encoder + (int)(562.25*arg/(3.3*3.1416))){
+    md.setSpeeds(-(201+Output), -(258-Output));
     myPID.Compute();
 //    Serial.print("Left:"); 
 //    Serial.print(leftEncoderValue);
@@ -217,28 +222,28 @@ void moveBackward(){
   md.setBrakes(400,400);
 }
 
-void turnLeft(){
-  leftEncoderValue = 0, rightEncoderValue = 0;
-  Output = 0;
-  
-  while((leftEncoderValue  <= 800.00) && 
-        (rightEncoderValue <= 800.00)){
-          md.setSpeeds(-(200+Output), 212-Output);
-          myPID.Compute();
-        }
-    md.setBrakes(400,400);
-}
-
-void turnRight(){
-  leftEncoderValue = 0, rightEncoderValue = 0;
-  Output = 0;
-
-  while((leftEncoderValue <= 800.00) && (rightEncoderValue <= 800.00)){
-    md.setSpeeds(200+Output, -(212-Output));
-    myPID.Compute();
-  }
-  md.setBrakes(400,400);
-}
+//void turnLeft(){
+//  leftEncoderValue = 0, rightEncoderValue = 0;
+//  Output = 0;
+//  
+//  while((leftEncoderValue  <= 800.00) && 
+//        (rightEncoderValue <= 800.00)){
+//          md.setSpeeds(-(200+Output), 212-Output);
+//          myPID.Compute();
+//        }
+//    md.setBrakes(400,400);
+//}
+//
+//void turnRight(){
+//  leftEncoderValue = 0, rightEncoderValue = 0;
+//  Output = 0;
+//
+//  while((leftEncoderValue <= 800.00) && (rightEncoderValue <= 800.00)){
+//    md.setSpeeds(200+Output, -(212-Output));
+//    myPID.Compute();
+//  }
+//  md.setBrakes(400,400);
+//}
 
 void sense(){
   
@@ -348,14 +353,17 @@ void leftEncoderInc(){
 
 void alignAngle() {
 
+  int cal_L_encoder = leftEncoderValue;
+  int cal_R_encoder = rightEncoderValue;
+
   double rad2deg = 180/3.14159; 
   
   int sensor_R_dis = ir_sense(sharp_rf);
   int sensor_L_dis = ir_sense(sharp_lf);
   
-  int sensorDiff = abs(sensor_R_dis - sensor_L_dis);
+  int sensorDiff;
 
-  int sensorMeanDiff = 0;
+  boolean isTooClose = false;
 
   sensor_R_dis = ir_sense(sharp_rf);
   sensor_L_dis = ir_sense(sharp_lf);
@@ -366,6 +374,15 @@ void alignAngle() {
     sensor_L_dis = ir_sense(sharp_lf);
   }
 
+  delay(100);
+
+  if(sensor_R_dis < 10 || sensor_L_dis < 10) {
+    isTooClose = true;
+    arg = 4;
+    moveBackward();
+    delay(500);
+  }
+  
   sensor_R_dis = ir_sense(sharp_rf);
   sensor_L_dis = ir_sense(sharp_lf);
   
@@ -373,16 +390,17 @@ void alignAngle() {
 
   while (sensorDiff > 0){
     
-    double sensorMeanDiff = (double)sensorDiff / 2;
+    double sensorMeanDiff = ((double)sensorDiff) / 2;
     double sinTheta = sensorMeanDiff / DIST_BETWEEN_SENSOR;
 
     double thetaAngle = (asin(sinTheta) * rad2deg);
-    
-    if (sensor_L_dis > sensor_R_dis){
-      rotateRight(thetaAngle);
-    }
-    else if (sensor_R_dis > sensor_L_dis){   
-      rotateLeft(thetaAngle);
+    if (thetaAngle < 90.0) {
+      if (sensor_L_dis > sensor_R_dis){
+        rotateRight(thetaAngle);
+      }
+      else if (sensor_R_dis > sensor_L_dis){   
+        rotateLeft(thetaAngle);
+      }
     }
     
     sensor_R_dis = ir_sense(sharp_rf);
@@ -390,11 +408,22 @@ void alignAngle() {
     
     sensorDiff = abs(sensor_R_dis - sensor_L_dis);
   }
+
+  if(isTooClose) {
+    arg=4;
+    moveForward();
+    delay(100);
+  }
+
+  leftEncoderValue = cal_L_encoder;
+  rightEncoderValue = cal_R_encoder;
   
 }
 
 int rotateRight(double angle) {
   
+  int right_L_encoder = leftEncoderValue;
+  int right_R_encoder = rightEncoderValue;
   leftEncoderValue = 0, rightEncoderValue = 0;
   Output = 0;
   double target_Tick = 0;
@@ -409,13 +438,17 @@ int rotateRight(double angle) {
   }
   //md.setBrakes(385, 400);
   md.setBrakes(400,400);
+  leftEncoderValue = right_L_encoder;
+  rightEncoderValue = right_R_encoder;
 }
 int rotateLeft(double angle) {
   
+  int left_L_encoder = leftEncoderValue;
+  int left_R_encoder = rightEncoderValue;
   leftEncoderValue = 0, rightEncoderValue = 0;
   Output = 0;
   double target_Tick = 0;
-  if (angle <= 90) target_Tick = angle * 9.17; //8.96
+  if (angle <= 90) target_Tick = angle * 9.13; //8.96
   else if (angle <=180 ) target_Tick = angle * 9.1;    //tune 180
   else if (angle <=360 ) target_Tick = angle * 8.95;
   else target_Tick = angle * 8.9;
@@ -426,8 +459,13 @@ int rotateLeft(double angle) {
   }
   //md.setBrakes(385, 400);
   md.setBrakes(400,400);
+  leftEncoderValue = left_L_encoder;
+  rightEncoderValue = left_R_encoder;
 }
 void adjustDistance() {
+  int ad_L_encoder = leftEncoderValue;
+  int ad_R_encoder = rightEncoderValue;
+  
   int sensor_R_dis = ir_sense(sharp_rf);
   int sensor_L_dis = ir_sense(sharp_lf);
   int sensor_C_dis = ir_sense(sharp_fc);
@@ -438,6 +476,8 @@ void adjustDistance() {
     sensor_L_dis = ir_sense(sharp_lf);
     sensor_C_dis = ir_sense(sharp_fc);
   }
+  leftEncoderValue = ad_L_encoder;
+  rightEncoderValue = ad_R_encoder;
 }
 void shutdown()
 {
