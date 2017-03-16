@@ -209,7 +209,7 @@ void moveForward(int dist) {
   //3.3 for lounge
   //3.18 for HWLab 3
   while(leftEncoderValue <= fwd_L_encoder + (int)(562.25*dist/(3.3*3.1416))|| rightEncoderValue <= fwd_R_encoder + (int)(562.25*dist/(3.3*3.1416))) {
-    md.setSpeeds(201+Output, 258-Output);
+    md.setSpeeds(188+Output, 258-Output);
     myPID.Compute();
 //    Serial.print("Left:");
 //    Serial.print(leftEncoderValue);
@@ -229,7 +229,7 @@ void moveBackward(int dist){
 //  Output = 0;
 
   while(leftEncoderValue <= bwd_L_encoder + (int)(562.25*dist/(3.3*3.1416)) || rightEncoderValue <= bwd_R_encoder + (int)(562.25*dist/(3.3*3.1416))){
-    md.setSpeeds(-(201+Output), -(258-Output));
+    md.setSpeeds(-(190+Output), -(258-Output));
     myPID.Compute();
 //    Serial.print("Left:"); 
 //    Serial.print(leftEncoderValue);
@@ -294,8 +294,8 @@ void sense(){
   
 }
 
-int ir_sense(SharpIR sharp) {
-  int dis=sharp.distance();  // this returns the distance to the object you're measuring
+float ir_sense(SharpIR sharp) {
+  float dis=sharp.distance();  // this returns the distance to the object you're measuring
   
   
   // returns it to the serial monitor
@@ -414,7 +414,7 @@ void alignAngle() {
   
   sensorDiff = abs(sensor_R_dis - sensor_L_dis);
 
-  while (sensorDiff > 0) {
+  while (sensorDiff > 0.3) {
 
     double sensorMeanDiff = ((double)sensorDiff) / 2;
     double sinTheta = sensorMeanDiff / DIST_BETWEEN_SENSOR;
