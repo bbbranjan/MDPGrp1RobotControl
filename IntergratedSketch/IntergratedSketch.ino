@@ -134,67 +134,73 @@ void loop() {
         message1 = "F";
         message2 = "done";
         mainMessage = message1 + message2 ;
-        delay(300);
+        //delay(300);
         Serial.println(mainMessage);      
       break;
       
       case 'B':
+        delay(300);
         Serial.print("p");
         moveBackward(arg);
         message1 = "B";
         message2 = "done";
         mainMessage = message1 + message2 ;
-        delay(300);
+        //delay(300);
         Serial.println(mainMessage);      
       break;
       
       case 'L':
+        delay(300);
         Serial.print("p");
         rotateLeft(90);
         message1 = "L";
         message2 = "done";
         mainMessage = message1 + message2 ;
-        delay(300);
+        //delay(300);
         Serial.println(mainMessage);      
       break;
       
       case 'R':
+        delay(300);
         Serial.print("p");
         rotateRight(90);
         message1 = "R";
         message2 = "done";
         mainMessage = message1 + message2 ;
-        delay(300);
+        //delay(300);
         Serial.println(mainMessage);      
       break;
       
       case 'S':
+        delay(300);
         Serial.print("p");
         sense();
         message1 = "S";
         message2 = "done";
         mainMessage = message1 + message2 ;
-        delay(300);
+        //delay(300);
         Serial.println(mainMessage);      
       break;
 
       case 'C':
+        delay(300);
         Serial.print("p");
         alignAngle();
         message1 = "C";
         message2 = "done";
         mainMessage = message1 + message2 ;
-        delay(300);
+        //delay(300);
         Serial.println(mainMessage);
       break;
 
       case 'D':
+        delay(300);
         Serial.print("p");
         adjustDistance();
         message1 = "D";
         message2 = "done";
         mainMessage = message1 + message2 ;
-        delay(300);
+        //delay(300);
         Serial.println(mainMessage);
       break;
   }
