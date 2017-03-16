@@ -12,7 +12,7 @@
 #define RS_IR A5
 #define FC_IR A1
 #define model 1080
-
+#define LSRS_OFFSET 4.0
 DualVNH5019MotorShield md;
 
 double leftEncoderValue=0;
@@ -123,14 +123,14 @@ void loop() {
     
       case 'F':
         Serial.print("p");
-        fc_init = ir_sense(sharp_fc);
+        //fc_init = ir_sense(sharp_fc);
         moveForward(arg);
-        fc_fin = ir_sense(sharp_fc);
-        while(abs(fc_fin - fc_init) < 2) {
-          moveForward(arg);
-          delay(300);
-          fc_fin = ir_sense(sharp_fc);
-        }
+        //fc_fin = ir_sense(sharp_fc);
+//        while(abs(fc_fin - fc_init) < 2) {
+//          moveForward(arg);
+//          delay(300);
+//          fc_fin = ir_sense(sharp_fc);
+//        }
         message1 = "F";
         message2 = "done";
         mainMessage = message1 + message2 ;
@@ -269,22 +269,22 @@ void sense(){
 //  Serial.print("LS_IR: ");
 //  samples_ls.add(ir_sense(sharp_ls));
 //  long m_ls = samples_ls.getMedian();
-  Serial.print(ir_sense(sharp_ls));
+  Serial.print(ir_sense(sharp_ls)-3);
   Serial.print(":");
 //  Serial.print("LF_IR: ");
 //  samples_lf.add(ir_sense(sharp_lf));
 //  long m_lf= samples_lf.getMedian();
-  Serial.print(ir_sense(sharp_lf));
+  Serial.print(ir_sense(sharp_lf)-LSRS_OFFSET);
   Serial.print(":"); 
 //  Serial.print("RF_IR: ");
 //  samples_rf.add(ir_sense(sharp_rf));
 //  long m_rf = samples_rf.getMedian();
-  Serial.print(ir_sense(sharp_rf));
+  Serial.print(ir_sense(sharp_rf)-LSRS_OFFSET);
   Serial.print(":"); 
 //  Serial.print("RS_IR: ") 
 //  samples_rs.add(ir_sense(sharp_rs));
 //  long m_rs = samples_rs.getMedian();
-  Serial.print(ir_sense(sharp_rs));
+  Serial.print(ir_sense(sharp_rs)-3);
   Serial.print(":");
 //  Serial.print("FC_IR: ")
 //  samples_fc.add(ir_sense(sharp_fc));
@@ -386,19 +386,19 @@ void alignAngle() {
 
   double rad2deg = 180/3.14159; 
   
-  int sensor_R_dis = ir_sense(sharp_rf);
-  int sensor_L_dis = ir_sense(sharp_lf);
+  int sensor_R_dis = ir_sense(sharp_rf)-LSRS_OFFSET;
+  int sensor_L_dis = ir_sense(sharp_lf)-LSRS_OFFSET;
   
   int sensorDiff;
 
   boolean isTooClose = false;
 
-  sensor_R_dis = ir_sense(sharp_rf);
-  sensor_L_dis = ir_sense(sharp_lf);
+  sensor_R_dis = ir_sense(sharp_rf)-LSRS_OFFSET;
+  sensor_L_dis = ir_sense(sharp_lf)-LSRS_OFFSET;
   while((sensor_R_dis < 7 || sensor_L_dis < 7) && (sensor_R_dis + sensor_L_dis < 14)) {
     moveBackward(1);
-    sensor_R_dis = ir_sense(sharp_rf);
-    sensor_L_dis = ir_sense(sharp_lf);
+    sensor_R_dis = ir_sense(sharp_rf)-LSRS_OFFSET;
+    sensor_L_dis = ir_sense(sharp_lf)-LSRS_OFFSET;
   }
 
   delay(100);
@@ -409,8 +409,8 @@ void alignAngle() {
     delay(500);
   }
   
-  sensor_R_dis = ir_sense(sharp_rf);
-  sensor_L_dis = ir_sense(sharp_lf);
+  sensor_R_dis = ir_sense(sharp_rf)-LSRS_OFFSET;
+  sensor_L_dis = ir_sense(sharp_lf)-LSRS_OFFSET;
   
   sensorDiff = abs(sensor_R_dis - sensor_L_dis);
 
@@ -432,8 +432,8 @@ void alignAngle() {
       rotateLeft(thetaAngle);
     }
     
-    sensor_R_dis = ir_sense(sharp_rf);
-    sensor_L_dis = ir_sense(sharp_lf);
+    sensor_R_dis = ir_sense(sharp_rf)-LSRS_OFFSET;
+    sensor_L_dis = ir_sense(sharp_lf)-LSRS_OFFSET;
     
     sensorDiff = abs(sensor_R_dis - sensor_L_dis);
   }
@@ -494,13 +494,13 @@ void adjustDistance() {
   int ad_L_encoder = leftEncoderValue;
   int ad_R_encoder = rightEncoderValue;
   
-  int sensor_R_dis = ir_sense(sharp_rf);
-  int sensor_L_dis = ir_sense(sharp_lf);
+  int sensor_R_dis = ir_sense(sharp_rf)-LSRS_OFFSET;
+  int sensor_L_dis = ir_sense(sharp_lf)-LSRS_OFFSET;
   int sensor_C_dis = ir_sense(sharp_fc);
   while((sensor_R_dis < 7 || sensor_L_dis < 7 || sensor_C_dis < 7) ) {
     moveBackward(1);
-    sensor_R_dis = ir_sense(sharp_rf);
-    sensor_L_dis = ir_sense(sharp_lf);
+    sensor_R_dis = ir_sense(sharp_rf)-LSRS_OFFSET;
+    sensor_L_dis = ir_sense(sharp_lf)-LSRS_OFFSET;
     sensor_C_dis = ir_sense(sharp_fc);
   }
   leftEncoderValue = ad_L_encoder;
