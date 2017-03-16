@@ -118,23 +118,33 @@ void loop() {
     i++;
   }
 //  Serial.println(arg);
-  switch(instruction){
+  int fc_init, fc_fin;
+  switch(instruction) {
     
       case 'F':
         Serial.print("p");
-        moveForward();
+        fc_init = ir_sense(sharp_fc);
+        moveForward(arg);
+        fc_fin = ir_sense(sharp_fc);
+        while(abs(fc_fin - fc_init) < 2) {
+          moveForward(arg);
+          delay(300);
+          fc_fin = ir_sense(sharp_fc);
+        }
         message1 = "F";
         message2 = "done";
         mainMessage = message1 + message2 ;
+        delay(300);
         Serial.println(mainMessage);      
       break;
       
       case 'B':
         Serial.print("p");
-        moveBackward();
+        moveBackward(arg);
         message1 = "B";
         message2 = "done";
         mainMessage = message1 + message2 ;
+        delay(300);
         Serial.println(mainMessage);      
       break;
       
@@ -144,6 +154,7 @@ void loop() {
         message1 = "L";
         message2 = "done";
         mainMessage = message1 + message2 ;
+        delay(300);
         Serial.println(mainMessage);      
       break;
       
@@ -153,6 +164,7 @@ void loop() {
         message1 = "R";
         message2 = "done";
         mainMessage = message1 + message2 ;
+        delay(300);
         Serial.println(mainMessage);      
       break;
       
@@ -162,6 +174,7 @@ void loop() {
         message1 = "S";
         message2 = "done";
         mainMessage = message1 + message2 ;
+        delay(300);
         Serial.println(mainMessage);      
       break;
 
@@ -171,6 +184,7 @@ void loop() {
         message1 = "C";
         message2 = "done";
         mainMessage = message1 + message2 ;
+        delay(300);
         Serial.println(mainMessage);
       break;
 
@@ -180,12 +194,13 @@ void loop() {
         message1 = "D";
         message2 = "done";
         mainMessage = message1 + message2 ;
+        delay(300);
         Serial.println(mainMessage);
       break;
   }
 }
 
-void moveForward() {
+void moveForward(int dist) {
 
   int fwd_L_encoder = leftEncoderValue;
   int fwd_R_encoder = rightEncoderValue;
@@ -193,7 +208,7 @@ void moveForward() {
 //  Output = 0;
   //3.3 for lounge
   //3.18 for HWLab 3
-  while(leftEncoderValue <= fwd_L_encoder + (int)(562.25*arg/(3.3*3.1416))|| rightEncoderValue <= fwd_R_encoder + (int)(562.25*arg/(3.3*3.1416))) {
+  while(leftEncoderValue <= fwd_L_encoder + (int)(562.25*dist/(3.3*3.1416))|| rightEncoderValue <= fwd_R_encoder + (int)(562.25*dist/(3.3*3.1416))) {
     md.setSpeeds(201+Output, 258-Output);
     myPID.Compute();
 //    Serial.print("Left:");
@@ -206,14 +221,14 @@ void moveForward() {
   md.setBrakes(400,400);
 }
 
-void moveBackward(){
+void moveBackward(int dist){
 
   int bwd_L_encoder = leftEncoderValue;
   int bwd_R_encoder = rightEncoderValue;
 //  leftEncoderValue = 0, rightEncoderValue = 0;
 //  Output = 0;
 
-  while(leftEncoderValue <= bwd_L_encoder + (int)(562.25*arg/(3.3*3.1416)) || rightEncoderValue <= bwd_R_encoder + (int)(562.25*arg/(3.3*3.1416))){
+  while(leftEncoderValue <= bwd_L_encoder + (int)(562.25*dist/(3.3*3.1416)) || rightEncoderValue <= bwd_R_encoder + (int)(562.25*dist/(3.3*3.1416))){
     md.setSpeeds(-(201+Output), -(258-Output));
     myPID.Compute();
 //    Serial.print("Left:"); 
@@ -381,8 +396,7 @@ void alignAngle() {
   sensor_R_dis = ir_sense(sharp_rf);
   sensor_L_dis = ir_sense(sharp_lf);
   while((sensor_R_dis < 7 || sensor_L_dis < 7) && (sensor_R_dis + sensor_L_dis < 14)) {
-    arg = 1;
-    moveBackward();
+    moveBackward(1);
     sensor_R_dis = ir_sense(sharp_rf);
     sensor_L_dis = ir_sense(sharp_lf);
   }
@@ -391,8 +405,7 @@ void alignAngle() {
 
   if(sensor_R_dis < 10 || sensor_L_dis < 10) {
     isTooClose = true;
-    arg = 3;
-    moveBackward();
+    moveBackward(2);
     delay(500);
   }
   
@@ -407,13 +420,16 @@ void alignAngle() {
     double sinTheta = sensorMeanDiff / DIST_BETWEEN_SENSOR;
 
     double thetaAngle = (asin(sinTheta) * rad2deg);
-    if (thetaAngle < 90.0) {
-      if (sensor_L_dis > sensor_R_dis){
-        rotateRight(thetaAngle);
-      }
-      else if (sensor_R_dis > sensor_L_dis){   
-        rotateLeft(thetaAngle);
-      }
+    if (thetaAngle > 90) {
+      leftEncoderValue = cal_L_encoder;
+      rightEncoderValue = cal_R_encoder;
+      return;
+    }
+    if (sensor_L_dis > sensor_R_dis){
+      rotateRight(thetaAngle);
+    }
+    else if (sensor_R_dis > sensor_L_dis){   
+      rotateLeft(thetaAngle);
     }
     
     sensor_R_dis = ir_sense(sharp_rf);
@@ -423,8 +439,7 @@ void alignAngle() {
   }
 
   if(isTooClose) {
-    arg=5;
-    moveForward();
+    moveForward(4);
     delay(100);
   }
 
@@ -440,7 +455,7 @@ int rotateRight(double angle) {
   leftEncoderValue = 0, rightEncoderValue = 0;
   Output = 0;
   double target_Tick = 0;
-  if (angle <= 90) target_Tick = angle * 9.13; //8.96
+  if (angle <= 90) target_Tick = angle * 9.12; //8.96
   else if (angle <=180 ) target_Tick = angle * 9.1;    //tune 180
   else if (angle <=360 ) target_Tick = angle * 8.95;
   else target_Tick = angle * 8.96;
@@ -461,7 +476,7 @@ int rotateLeft(double angle) {
   leftEncoderValue = 0, rightEncoderValue = 0;
   Output = 0;
   double target_Tick = 0;
-  if (angle <= 90) target_Tick = angle * 9.13; //8.96
+  if (angle <= 90) target_Tick = angle * 9.1; //8.96
   else if (angle <=180 ) target_Tick = angle * 9.1;    //tune 180
   else if (angle <=360 ) target_Tick = angle * 8.95;
   else target_Tick = angle * 8.9;
@@ -483,8 +498,7 @@ void adjustDistance() {
   int sensor_L_dis = ir_sense(sharp_lf);
   int sensor_C_dis = ir_sense(sharp_fc);
   while((sensor_R_dis < 7 || sensor_L_dis < 7 || sensor_C_dis < 7) ) {
-    arg = 1;
-    moveBackward();
+    moveBackward(1);
     sensor_R_dis = ir_sense(sharp_rf);
     sensor_L_dis = ir_sense(sharp_lf);
     sensor_C_dis = ir_sense(sharp_fc);
