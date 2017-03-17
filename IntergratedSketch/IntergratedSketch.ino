@@ -24,7 +24,7 @@ double turnLeftEncoderTarget, turnRightEncoderTarget,
 
 double Kp=0.45, Ki=0.0, Kd=0.0; 
 // 562.25 squave wave = one revolution
-PID myPID(&leftEncoderValue, &Output, &rightEncoderValue, Kp, Ki, Kd, DIRECT);
+PID myPID(&leftEncoderValue, &rightEncoderValue, 0 , Kp, Ki, Kd, DIRECT);
 /*PID(&input, &output, &setpoint, Kp, Ki, Kd, Direction
 Parameters: input - the variable we are trying to control
             output - the variable that will be adjusted by PID
@@ -445,7 +445,7 @@ void alignAngle() {
   }
 
   if(isTooClose) {
-    moveForward(4);
+    moveForward(2);
     delay(100);
   }
 
