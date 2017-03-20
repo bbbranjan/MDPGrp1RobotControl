@@ -15,7 +15,7 @@ double difference;
 double Setpoint, Input, Output;
 //double Kp=1.7, Ki=0, Kd=0;
 //562.25 square wave = one revolution
-PID myPID(&leftEncoderValue, &Output, &rightEncoderValue, 0.50, 0.0, 0.0, DIRECT);
+PID myPID(&leftEncoderValue, &Output, &rightEncoderValue, 0.5, 0.0, 0.0, DIRECT);
 //PID(&input, &output, &setpoint, Kp, Ki, Kd, Direction)
 //Parameters: Input - the variable we are trying to control
 //          : Output - the variable that willl be adjusted by PID
@@ -37,7 +37,7 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  md.setSpeeds(201+Output,258-Output);
+  md.setSpeeds(200+Output,241-Output);
   
   myPID.Compute();
   
@@ -51,7 +51,7 @@ void loop() {
   Serial.print(", Diff:");
   Serial.println(Output);
 
-  if((leftEncoderValue > 5420.00) || (rightEncoderValue > 5420.00)) {
+  if((leftEncoderValue > 54200.00) || (rightEncoderValue > 54200.00)) {
     md.setBrakes(400,400);
     shutdown();
   }
