@@ -15,7 +15,7 @@
 #define model 1080
 #define LFRF_OFFSET 4.7
 #define FC_OFFSET 2.0
-#define LSRS_OFFSET 8
+#define LSRS_OFFSET 8.5
 DualVNH5019MotorShield md;
 
 double leftEncoderValue=0;
@@ -69,7 +69,7 @@ RunningMedian samples_fc = RunningMedian(7);
 
 double DIST_BETWEEN_SENSOR = 18.0;
 
-double SPEED_L = 250, SPEED_R = 280;
+double SPEED_L = 250, SPEED_R = 250; //280;
 
 void setup() {
   // put your setup code here, to run once:
