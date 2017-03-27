@@ -37,7 +37,7 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  md.setSpeeds(200+Output,241-Output);
+  md.setSpeeds(200+Output,242-Output);
   
   myPID.Compute();
   
@@ -51,7 +51,7 @@ void loop() {
   Serial.print(", Diff:");
   Serial.println(Output);
 
-  if((leftEncoderValue > 54200.00) || (rightEncoderValue > 54200.00)) {
+  if((leftEncoderValue > 4881.00) || (rightEncoderValue > 4881.00)) {
     md.setBrakes(400,400);
     shutdown();
   }
