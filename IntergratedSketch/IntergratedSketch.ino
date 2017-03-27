@@ -15,7 +15,7 @@
 #define model 1080
 #define LFRF_OFFSET 4.7
 #define FC_OFFSET 2.0
-#define LSRS_OFFSET 3.8
+#define LSRS_OFFSET 8
 DualVNH5019MotorShield md;
 
 double leftEncoderValue=0;
@@ -68,6 +68,8 @@ RunningMedian samples_rs = RunningMedian(7);
 RunningMedian samples_fc = RunningMedian(7);
 
 double DIST_BETWEEN_SENSOR = 18.0;
+
+double SPEED_L = 250, SPEED_R = 280;
 
 void setup() {
   // put your setup code here, to run once:
@@ -220,6 +222,30 @@ void loop() {
         Serial.println(mainMessage);
       break;
 
+      case '1':
+      delay(100);
+        Serial.print("p");
+        SPEED_L = 200;
+        SPEED_R = 242;
+        message1 = "Exploration";
+        message2 = "Begin";
+        mainMessage = message1 + message2 ;
+        //delay(300);
+        Serial.println(mainMessage);
+      break;
+
+      case '2':
+      delay(100);
+        Serial.print("p");
+        SPEED_L = 300;
+        SPEED_R = 274;
+        message1 = "ShortestPath";
+        message2 = "Begin";
+        mainMessage = message1 + message2 ;
+        //delay(300);
+        Serial.println(mainMessage);
+      break;
+
       default:
         message1 = "N";
         message2 = "none";
@@ -256,9 +282,9 @@ void moveForward(double dist) {
     fwd_dist = (562.25*dist)/(3.05*3.1416);
   }
   while((leftEncoderValue <= fwd_L_encoder + fwd_dist)|| (rightEncoderValue <= fwd_R_encoder + fwd_dist)) {
-    md.setSpeeds(350-Output,350+Output);
+//    md.setSpeeds(300-Output,274+Output);
     //md.setSpeeds(200+Output,242-Output);
-//    md.setSpeeds(200+Output,242-Output);
+    md.setSpeeds(SPEED_L-Output,SPEED_R+Output);
 //    md.setSpeeds(202+Output,233-Output);
     myPID.Compute();
 //    Serial.print("Left:");
@@ -300,7 +326,7 @@ void moveBackward(double dist){
   }
   
   while((leftEncoderValue <= bwd_L_encoder + bwd_dist) || (rightEncoderValue <= bwd_R_encoder + bwd_dist)){
-    md.setSpeeds(-(200+Output),-(242-Output));
+    md.setSpeeds(-(SPEED_L-Output),-(SPEED_L+Output));
     myPID.Compute();
 //    Serial.print("Left:"); 
 //    Serial.print(leftEncoderValue);
@@ -409,7 +435,7 @@ void alignAngle() {
 
   moveCloserToWall();
 
-  adjustDistance();
+  adjustDistance(); 
   
   sensor_R_dis = ir_sense(sharp_rf)-LSRS_OFFSET;
   sensor_L_dis = ir_sense(sharp_lf)-LSRS_OFFSET;
@@ -465,7 +491,7 @@ int rotateRight(double angle) {
 
   while (leftEncoderValue < target_Tick ) {
     myPID.Compute();
-    md.setSpeeds((200+Output), -(200-Output));
+    md.setSpeeds((250-Output), -(250+Output));
   }
   //md.setBrakes(385, 400);
   md.setBrakes(400,400);
@@ -479,14 +505,14 @@ int rotateLeft(double angle) {
   leftEncoderValue = 0, rightEncoderValue = 0;
   Output = 0;
   double target_Tick = 0;
-  if (angle <= 90) target_Tick = angle * 9.02; //8.96
+  if (angle <= 90) target_Tick = angle * 8.96; //8.96
   else if (angle <=180 ) target_Tick = angle * 9.1;    //tune 180
   else if (angle <=360 ) target_Tick = angle * 8.95;
   else target_Tick = angle * 8.9;
 
   while (leftEncoderValue < target_Tick ) {
     myPID.Compute();
-    md.setSpeeds(-(200+Output), (200-Output));
+    md.setSpeeds(-(250-Output), (250+Output));
   }
   //md.setBrakes(385, 400);
   md.setBrakes(400,400);
