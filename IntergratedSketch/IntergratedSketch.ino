@@ -256,8 +256,12 @@ void moveForward(double dist) {
     fwd_dist = (562.25*dist)/(3.05*3.1416);
   }
   while((leftEncoderValue <= fwd_L_encoder + fwd_dist)|| (rightEncoderValue <= fwd_R_encoder + fwd_dist)) {
+<<<<<<< HEAD
     md.setSpeeds(350-Output,350+Output);
     //md.setSpeeds(200+Output,242-Output);
+=======
+    md.setSpeeds(200+Output,242-Output);
+>>>>>>> origin/master
 //    md.setSpeeds(202+Output,233-Output);
     myPID.Compute();
 //    Serial.print("Left:");
