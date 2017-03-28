@@ -225,8 +225,8 @@ void loop() {
       case '1':
       delay(100);
         Serial.print("p");
-        SPEED_L = 200;
-        SPEED_R = 242;
+        SPEED_L = 200;//200;
+        SPEED_R = 200;//242;
         message1 = "Exploration";
         message2 = "Begin";
         mainMessage = message1 + message2 ;
