@@ -28,21 +28,19 @@
 class SharpIR
 {
   public:
-    SharpIR (int irPin, float avg, float tolerance, int sensorModel);
-    float distance();
+    SharpIR (int irPin, int avg, double tolerance, double offset, int sensorModel);
+    double distance();
     
     
   private:
     
-    float cm();
+    double cm();
     
     int _irPin;
     int _model;
-    float _avg;
-    float _p;
-    float _sum;
-    float _previousDistance;
-    float _tol;
+    int _avg;
+	double _offset;
+    double _tol;
     
 };
 

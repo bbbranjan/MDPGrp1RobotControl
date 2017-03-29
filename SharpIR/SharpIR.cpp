@@ -44,12 +44,14 @@
 
 
 
-SharpIR::SharpIR(int irPin, float avg, float tolerance, int sensorModel) {
+SharpIR::SharpIR(int irPin, int avg, double tolerance, double offset, int sensorModel) {
   
     _irPin=irPin;
     _avg=avg;
-    _tol=tolerance/100;
+    _tol=tolerance;
     _model=sensorModel;
+	_offset = offset;
+
     
     analogReference(DEFAULT);
  
@@ -68,25 +70,25 @@ SharpIR::SharpIR(int irPin, float avg, float tolerance, int sensorModel) {
 //    distance range they are designed for (in cm)
  
 
-float floatMap(float value, float fromLow, float fromHigh, float toLow, float toHigh) {
+double doubleMap(double value, double fromLow, double fromHigh, double toLow, double toHigh) {
   return (value - fromLow) * (toHigh - toLow) / (fromHigh - fromLow) + toLow;
 }
 
 
-float SharpIR::cm() {
+double SharpIR::cm() {
     
-    float raw=analogRead(_irPin);
-    float voltFromRaw=floatMap(raw, 0, 1023, 0, 5000);
+    double raw=analogRead(_irPin);
+    double voltFromRaw=doubleMap(raw, 0., 1023., 0., 5000.);
     
-    float puntualDistance;
+    double puntualDistance;
     
     if (_model==1080) {
         
-        puntualDistance=27.728*pow(voltFromRaw/1000, -1.2045);
+        puntualDistance=27.728*pow(voltFromRaw/1000., -1.2045);
         
     }else if (_model==20150){
     
-        puntualDistance=61.573*pow(voltFromRaw/1000, -1.1068);
+        puntualDistance=61.573*pow(voltFromRaw/1000., -1.1068);
         
     }
     
@@ -98,32 +100,33 @@ float SharpIR::cm() {
 
 
 
-float SharpIR::distance() {
-
-    _p=0;
-    _sum=0;
+double SharpIR::distance() {
+    int p=0;
+    double sum=0.;
+	double previousDistance = 0.f;
 
     
     for (int i=0; i<_avg; i++){
+		double foo = cm();
+        for (int j = 0; j < 60 && isnan(foo); ++j, foo = cm())
+			;
+		
+		if (isnan(foo)) {
+			break;
+		}
         
-        float foo=cm();
-        
-        if (foo>=(_tol*_previousDistance)){
-        
-            _previousDistance=foo;
-            _sum=_sum+foo;
-            _p++;
-            
+        if (foo>=(_tol*previousDistance)){
+            previousDistance=foo;
+            sum+=foo;
+            p++;
         }
-        
-        
     }
-
-    
-    float accurateDistance=_sum/_p;
-    
-    return accurateDistance;
-
+	
+	if (p == 0) {
+		return 0.;
+	}
+    double accurateDistance=sum/p;
+    return accurateDistance - _offset;
 }
 
 
