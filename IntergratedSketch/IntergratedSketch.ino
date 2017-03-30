@@ -205,7 +205,7 @@ void loop() {
 
       case '1':
         Serial.print("p");
-        SPEED_L = 250;//200;
+        SPEED_L = 225;//200;
         SPEED_R = 250;//242;
         message1 = "Exploration";
         message2 = "Begin";
