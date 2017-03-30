@@ -125,7 +125,6 @@ void loop() {
     i++;
   }
 //  Serial.println(arg);
-  int fc_init, fc_fin;
   switch(instruction) {
     
       case 'F':
@@ -206,8 +205,8 @@ void loop() {
 
       case '1':
         Serial.print("p");
-        SPEED_L = 200;//200;
-        SPEED_R = 200;//242;
+        SPEED_L = 250;//200;
+        SPEED_R = 250;//242;
         message1 = "Exploration";
         message2 = "Begin";
         mainMessage = message1 + message2 ;
@@ -217,8 +216,8 @@ void loop() {
 
       case '2':
         Serial.print("p");
-        SPEED_L = 300;
-        SPEED_R = 274;
+        SPEED_L = 275;
+        SPEED_R = 300/*274*/;
         message1 = "ShortestPath";
         message2 = "Begin";
         mainMessage = message1 + message2 ;
@@ -235,9 +234,8 @@ void loop() {
 }
 
 void moveForward(double dist) {
-
-  int fwd_L_encoder = leftEncoderValue;
-  int fwd_R_encoder = rightEncoderValue;
+  double fwd_L_encoder = leftEncoderValue;
+  double fwd_R_encoder = rightEncoderValue;
 //  leftEncoderValue = 0, rightEncoderValue = 0;
 //  Output = 0;
   //3.3 for lounge
@@ -261,6 +259,16 @@ void moveForward(double dist) {
   else {
     fwd_dist = (562.25*dist)/(3.05*3.1416);
   }
+//  Serial.print("before l: ");
+//  Serial.print(leftEncoderValue);
+//  Serial.print(" r: ");
+//  Serial.print(rightEncoderValue);
+//  Serial.print(" fwl: ");
+//  Serial.print(fwd_L_encoder);
+//  Serial.print(" fwr: ");
+//  Serial.print(fwd_R_encoder);
+//  Serial.print("fw: ");
+//  Serial.print(fwd_dist, 2);
   while((leftEncoderValue <= fwd_L_encoder + fwd_dist)|| (rightEncoderValue <= fwd_R_encoder + fwd_dist)) {
 //    md.setSpeeds(300-Output,274+Output);
     //md.setSpeeds(200+Output,242-Output);
@@ -274,13 +282,19 @@ void moveForward(double dist) {
 //    Serial.print(", Diff:");
 //    Serial.println(Output);
   }
+  
   md.setBrakes(-400,-400);
+
+//  Serial.print("-- after l: ");
+//  Serial.print(leftEncoderValue);
+//  Serial.print(" r: ");
+//  Serial.print(rightEncoderValue);
 }
 
 void moveBackward(double dist){
 
-  int bwd_L_encoder = leftEncoderValue;
-  int bwd_R_encoder = rightEncoderValue;
+  double bwd_L_encoder = leftEncoderValue;
+  double bwd_R_encoder = rightEncoderValue;
 //  leftEncoderValue = 0, rightEncoderValue = 0;
 //  Output = 0;
 //  double bwd_dist = (562.25*dist)/(3.3*3.1416);
@@ -385,8 +399,8 @@ void leftEncoderInc(){
 
 void alignAngle() {
 
-  int cal_L_encoder = leftEncoderValue;
-  int cal_R_encoder = rightEncoderValue;
+  double cal_L_encoder = leftEncoderValue;
+  double cal_R_encoder = rightEncoderValue;
 
   double rad2deg = 180/3.14159; 
   
@@ -460,10 +474,10 @@ void alignAngle() {
   
 }
 
-int rotateRight(double angle) {
+void rotateRight(double angle) {
   
-  int right_L_encoder = leftEncoderValue;
-  int right_R_encoder = rightEncoderValue;
+  double right_L_encoder = leftEncoderValue;
+  double right_R_encoder = rightEncoderValue;
   leftEncoderValue = 0, rightEncoderValue = 0;
   Output = 0;
   double target_Tick = 0;
@@ -481,10 +495,10 @@ int rotateRight(double angle) {
   leftEncoderValue = right_L_encoder;
   rightEncoderValue = right_R_encoder;
 }
-int rotateLeft(double angle) {
+void rotateLeft(double angle) {
   
-  const int left_L_encoder = leftEncoderValue;
-  const int left_R_encoder = rightEncoderValue;
+  const double left_L_encoder = leftEncoderValue;
+  const double left_R_encoder = rightEncoderValue;
   leftEncoderValue = 0, rightEncoderValue = 0;
   Output = 0;
   double target_Tick = 0;
@@ -503,10 +517,10 @@ int rotateLeft(double angle) {
   rightEncoderValue = left_R_encoder;
 }
 
-int rotateRightCal(double angle) {
+void rotateRightCal(double angle) {
   
-  int right_L_encoder = leftEncoderValue;
-  int right_R_encoder = rightEncoderValue;
+  double right_L_encoder = leftEncoderValue;
+  double right_R_encoder = rightEncoderValue;
   leftEncoderValue = 0, rightEncoderValue = 0;
   Output = 0;
   double target_Tick = 0;
@@ -524,10 +538,10 @@ int rotateRightCal(double angle) {
   leftEncoderValue = right_L_encoder;
   rightEncoderValue = right_R_encoder;
 }
-int rotateLeftCal(double angle) {
+void rotateLeftCal(double angle) {
   
-  const int left_L_encoder = leftEncoderValue;
-  const int left_R_encoder = rightEncoderValue;
+  const double left_L_encoder = leftEncoderValue;
+  const double left_R_encoder = rightEncoderValue;
   leftEncoderValue = 0, rightEncoderValue = 0;
   Output = 0;
   double target_Tick = 0;
@@ -550,8 +564,8 @@ void adjustDistance() {
 
   moveFwdDistanceCalibration();
   
-  int ad_L_encoder = leftEncoderValue;
-  int ad_R_encoder = rightEncoderValue;
+  double ad_L_encoder = leftEncoderValue;
+  double ad_R_encoder = rightEncoderValue;
   double sensor_R_dis = ir_sense(sharp_rf);
   double sensor_L_dis = ir_sense(sharp_lf);
   double sensor_C_dis = ir_sense(sharp_fc);
@@ -566,8 +580,8 @@ void adjustDistance() {
   rightEncoderValue = ad_R_encoder;
 }
 void moveCloserToWall() {
-  int mw_L_encoder = leftEncoderValue;
-  int mw_R_encoder = rightEncoderValue;
+  double mw_L_encoder = leftEncoderValue;
+  double mw_R_encoder = rightEncoderValue;
   
   double sensor_R_dis = ir_sense(sharp_rf);
   double sensor_L_dis = ir_sense(sharp_lf);
@@ -583,8 +597,8 @@ void moveCloserToWall() {
   rightEncoderValue = mw_R_encoder;
 }
 void moveFwdDistanceCalibration() {
-  int mFwdDC_L_encoder = leftEncoderValue;
-  int mFwdDC_R_encoder = rightEncoderValue;
+  double mFwdDC_L_encoder = leftEncoderValue;
+  double mFwdDC_R_encoder = rightEncoderValue;
 
   double diss[] = {ir_sense(sharp_rf), ir_sense(sharp_lf), ir_sense(sharp_fc)};
   SharpIR* sensors[] = {&sharp_rf, &sharp_lf, &sharp_fc};
