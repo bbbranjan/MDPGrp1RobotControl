@@ -216,7 +216,7 @@ void loop() {
 
       case '2':
         Serial.print("p");
-        SPEED_L = 275;
+        SPEED_L = 300;
         SPEED_R = 300/*274*/;
         message1 = "ShortestPath";
         message2 = "Begin";
@@ -275,12 +275,12 @@ void moveForward(double dist) {
     md.setSpeeds(SPEED_L-Output,SPEED_R+Output);
 //    md.setSpeeds(202+Output,233-Output);
     myPID.Compute();
-//    Serial.print("Left:");
-//    Serial.print(leftEncoderValue);
-//    Serial.print(", Right:");
-//    Serial.print(rightEncoderValue);
-//    Serial.print(", Diff:");
-//    Serial.println(Output);
+    Serial.print("Left:");
+    Serial.print(leftEncoderValue);
+    Serial.print(", Right:");
+    Serial.print(rightEncoderValue);
+    Serial.print(", Diff:");
+    Serial.println(Output);
   }
   
   md.setBrakes(-400,-400);
