@@ -70,7 +70,7 @@ RunningMedian samples_fc = RunningMedian(7);
 
 double DIST_BETWEEN_SENSOR = 18.0;
 
-double SPEED_L = 250, SPEED_R = 250; //280;
+double SPEED_L = 235, SPEED_R = 250; //280;
 
 void setup() {
   // put your setup code here, to run once:
@@ -78,6 +78,7 @@ void setup() {
   md.init(); //initialise the motor drivers
   pinMode(LEFT_ENCODER, INPUT); //set digital pin 3 as input
   pinMode(RIGHT_ENCODER, INPUT); // set digital pin 5 as input
+  
   attachPCINT(digitalPinToPCINT(LEFT_ENCODER), leftEncoderInc, HIGH);
   attachPCINT(digitalPinToPCINT(RIGHT_ENCODER), rightEncoderInc, HIGH);
   myPID.SetOutputLimits(-50, 50);
@@ -205,7 +206,7 @@ void loop() {
 
       case '1':
         Serial.print("p");
-        SPEED_L = 215;//200;
+        SPEED_L = 235;//200;
         SPEED_R = 250;//242;
         message1 = "Exploration";
         message2 = "Begin";
@@ -216,7 +217,7 @@ void loop() {
 
       case '2':
         Serial.print("p");
-        SPEED_L = 300;
+        SPEED_L = 274;
         SPEED_R = 300/*274*/;
         message1 = "ShortestPath";
         message2 = "Begin";
@@ -275,12 +276,12 @@ void moveForward(double dist) {
     md.setSpeeds(SPEED_L-Output,SPEED_R+Output);
 //    md.setSpeeds(202+Output,233-Output);
     myPID.Compute();
-    Serial.print("Left:");
-    Serial.print(leftEncoderValue);
-    Serial.print(", Right:");
-    Serial.print(rightEncoderValue);
-    Serial.print(", Diff:");
-    Serial.println(Output);
+//    Serial.print("Left:");
+//    Serial.print(leftEncoderValue);
+//    Serial.print(", Right:");
+//    Serial.print(rightEncoderValue);
+//    Serial.print(", Diff:");
+//    Serial.println(Output);
   }
   
   md.setBrakes(-400,-400);
@@ -320,7 +321,7 @@ void moveBackward(double dist){
   }
   
   while((leftEncoderValue <= bwd_L_encoder + bwd_dist) || (rightEncoderValue <= bwd_R_encoder + bwd_dist)){
-    md.setSpeeds(-(SPEED_L-Output),-(SPEED_L+Output));
+    md.setSpeeds(-(SPEED_L-Output),-(SPEED_R+Output));
     myPID.Compute();
 //    Serial.print("Left:"); 
 //    Serial.print(leftEncoderValue);
@@ -409,6 +410,37 @@ void alignAngle() {
   
   double sensorDiff;
 
+  sensor_R_dis = ir_sense(sharp_rf);
+  sensor_L_dis = ir_sense(sharp_lf);
+  
+  sensorDiff = abs(sensor_R_dis - sensor_L_dis);
+
+  while (sensorDiff > 0.2) {
+ 
+    double sensorMeanDiff = ((double)sensorDiff) / 2;
+    double sinTheta = sensorMeanDiff / DIST_BETWEEN_SENSOR;
+  
+    double thetaAngle = (asin(sinTheta) * rad2deg);
+//    Serial.print(thetaAngle);
+    if (thetaAngle > 90) {
+      leftEncoderValue = cal_L_encoder;
+      rightEncoderValue = cal_R_encoder;
+      return;
+    }
+    if (sensor_L_dis > sensor_R_dis){
+      rotateRightCal(thetaAngle);
+    }
+    else if (sensor_R_dis > sensor_L_dis){   
+      rotateLeftCal(thetaAngle);
+    }
+    delay(100);
+    sensor_R_dis = ir_sense(sharp_rf);
+    sensor_L_dis = ir_sense(sharp_lf);
+
+    //Serial.print("r: "); Serial.print(sensor_R_dis); Serial.print("l: "); Serial.print(sensor_L_dis); Serial.print(' ');
+    sensorDiff = abs(sensor_R_dis - sensor_L_dis);
+  }
+
 //  boolean isTooClose = false;
 
 //  sensor_R_dis = ir_sense(sharp_rf)-LFRF_OFFSET;
@@ -427,7 +459,9 @@ void alignAngle() {
 ////    delay(500);
 ////  }
 
-  moveCloserToWall();
+//  moveCloserToWall();
+
+  moveFwdDistanceCalibration();
 
   adjustDistance(); 
   
@@ -481,7 +515,7 @@ void rotateRight(double angle) {
   leftEncoderValue = 0, rightEncoderValue = 0;
   Output = 0;
   double target_Tick = 0;
-  if (angle <= 90) target_Tick = angle * 9.02; //8.96
+  if (angle <= 90) target_Tick = angle * 8.82; //8.96
   else if (angle <=180 ) target_Tick = angle * 9.1;    //tune 180
   else if (angle <=360 ) target_Tick = angle * 8.95;
   else target_Tick = angle * 8.96;
@@ -502,7 +536,7 @@ void rotateLeft(double angle) {
   leftEncoderValue = 0, rightEncoderValue = 0;
   Output = 0;
   double target_Tick = 0;
-  if (angle <= 90) target_Tick = angle * 8.96; //8.96
+  if (angle <= 90) target_Tick = angle * 8.88; //8.96
   else if (angle <=180 ) target_Tick = angle * 9.1;    //tune 180
   else if (angle <=360 ) target_Tick = angle * 8.95;
   else target_Tick = angle * 8.9;
@@ -524,7 +558,7 @@ void rotateRightCal(double angle) {
   leftEncoderValue = 0, rightEncoderValue = 0;
   Output = 0;
   double target_Tick = 0;
-  if (angle <= 90) target_Tick = angle * 9.02; //8.96
+  if (angle <= 90) target_Tick = angle * 8.82 ; //8.96
   else if (angle <=180 ) target_Tick = angle * 9.1;    //tune 180
   else if (angle <=360 ) target_Tick = angle * 8.95;
   else target_Tick = angle * 8.96;
@@ -545,7 +579,7 @@ void rotateLeftCal(double angle) {
   leftEncoderValue = 0, rightEncoderValue = 0;
   Output = 0;
   double target_Tick = 0;
-  if (angle <= 90) target_Tick = angle * 8.96; //8.96
+  if (angle <= 90) target_Tick = angle * 8.88; //8.96
   else if (angle <=180 ) target_Tick = angle * 9.1;    //tune 180
   else if (angle <=360 ) target_Tick = angle * 8.95;
   else target_Tick = angle * 8.9;
@@ -614,10 +648,17 @@ void moveFwdDistanceCalibration() {
 
 //  Serial.print("index: ");
 //  Serial.println(min_index);
-  while(ir_sense(*sensors[min_index]) > 6.5) {
+  double last_sense = 0.0;
+  double curr_sense = ir_sense(*sensors[min_index]);
+  while(curr_sense > 6.5) {
+    last_sense = curr_sense;
     //Serial.println(ir_sense(*sensors[min_index]));
     moveForward(0.2);
     delay(100);
+    curr_sense = ir_sense(*sensors[min_index]);
+    if(last_sense - curr_sense < 0.1)
+      break;
+    
   }
   leftEncoderValue = mFwdDC_L_encoder;
   rightEncoderValue = mFwdDC_R_encoder;
